@@ -31,3 +31,5 @@ Thumbs.db
 # Sistema operacional
 tmp/
 temp/
+.vercel
+.env*.local
