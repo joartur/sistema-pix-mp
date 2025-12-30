@@ -1,35 +1,50 @@
-# 🚀 Sistema de Pagamento PIX
+# 💰 Sistema de Pagamento PIX
 
-Sistema completo de pagamento via PIX com interface moderna e intuitiva.
+![PIX Payment](https://img.shields.io/badge/PIX-Brazil-green)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-## 📋 Funcionalidades
+Sistema completo para gerar pagamentos PIX com valor personalizado. Permite criar QR Codes PIX para qualquer valor entre R$ 0,01 e R$ 99.999.999.999,99.
 
-- ✅ Listagem de produtos
-- ✅ Geração de QR Code PIX
-- ✅ Verificação de status em tempo real
-- ✅ Interface responsiva e moderna
-- ✅ Páginas de sucesso e erro
-- ✅ Sistema completo frontend + backend
+## 🚀 Demonstração
 
-## 🛠️ Tecnologias
+**Acesse o sistema online:** [https://pix-payment-system.vercel.app](https://pix-payment-system.vercel.app)
 
-- **Backend**: Node.js, Express, Mercado Pago API
-- **Frontend**: HTML5, CSS3, JavaScript Vanilla
-- **QR Code**: Biblioteca QRCode.js
-- **Estilos**: CSS Moderno com variáveis CSS
-- **Ícones**: Font Awesome
+## ✨ Funcionalidades
 
-## 🚀 Instalação Rápida
+- ✅ **Valor personalizado:** Digite qualquer valor (R$ 0,01 a R$ 99.999.999.999,99)
+- ✅ **QR Code dinâmico:** Geração automática de QR Code PIX
+- ✅ **Interface moderna:** Design responsivo e intuitivo
+- ✅ **Verificação em tempo real:** Status do pagamento atualizado automaticamente
+- ✅ **Modal de confirmação:** Popup bonito quando pagamento é aprovado
+- ✅ **Integração Mercado Pago:** Suporte para sandbox e produção
 
-### 1. Clonar e configurar
+## 🛠 Tecnologias
+
+- **Backend:** Node.js, Express, Mercado Pago API
+- **Frontend:** HTML5, CSS3, JavaScript Vanilla
+- **QR Code:** QRCode.js, Google Charts API
+- **Deploy:** Vercel (frontend + backend)
+- **Segurança:** Helmet, CORS, Rate Limiting
+
+## 📦 Instalação Local
+
 ```bash
-# Criar diretório do projeto
-mkdir pix-payment
-cd pix-payment
+# 1. Clone o repositório
+git clone https://github.com/seu-usuario/pix-payment-system.git
 
-# Criar estrutura de pastas
-mkdir -p public/assets/{css,js}
-mkdir -p src/services
+# 2. Entre na pasta
+cd pix-payment-system
 
-# Inicializar projeto Node.js
-npm init -y
+# 3. Instale as dependências
+npm install
+
+# 4. Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o .env com suas credenciais do Mercado Pago
+
+# 5. Inicie o servidor
+npm run dev
+
+# 6. Acesse no navegador
+http://localhost:3000
