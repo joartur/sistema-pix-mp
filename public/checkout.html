@@ -636,6 +636,261 @@
         }
     </style>
 
+<!-- Modal de Código Copiado -->
+<div id="copy-modal" class="copy-modal">
+    <div class="copy-modal-content">
+        <div class="copy-modal-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Código PIX Copiado!</h3>
+        <p>O código foi copiado para sua área de transferência.</p>
+        <div class="copy-instructions">
+            <p><strong>Agora:</strong></p>
+            <ol>
+                <li>Abra seu app bancário</li>
+                <li>Toque em "PIX Copia e Cola"</li>
+                <li>Cole o código e confirme</li>
+            </ol>
+        </div>
+        <button class="btn-modal-ok" onclick="closeCopyModal()">
+            <i class="fas fa-check"></i> Entendi
+        </button>
+    </div>
+</div>
+
+<style>
+    /* Modal de Cópia */
+    .copy-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        animation: fadeIn 0.3s ease;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .copy-modal-content {
+        background: white;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.4s ease;
+    }
+    
+    .copy-modal-icon {
+        font-size: 60px;
+        color: #4CAF50;
+        margin-bottom: 20px;
+        animation: bounce 0.6s ease;
+    }
+    
+    .copy-modal-content h3 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 24px;
+    }
+    
+    .copy-modal-content p {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    
+    .copy-instructions {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    
+    .copy-instructions ol {
+        margin-left: 20px;
+        margin-top: 10px;
+    }
+    
+    .copy-instructions li {
+        margin-bottom: 8px;
+        color: #555;
+    }
+    
+    .btn-modal-ok {
+        background: linear-gradient(135deg, #00BFA5, #00897B);
+        color: white;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-modal-ok:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 191, 165, 0.3);
+    }
+    
+    /* Animações */
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px); 
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0); 
+        }
+    }
+    
+    /* Responsividade */
+    @media (max-width: 480px) {
+        .copy-modal-content {
+            padding: 20px;
+        }
+        
+        .copy-modal-icon {
+            font-size: 50px;
+        }
+        
+        .copy-modal-content h3 {
+            font-size: 20px;
+        }
+    }
+</style>
+
+<script>
+    // Funções para o modal de cópia
+    function showCopyModal() {
+        const modal = document.getElementById('copy-modal');
+        modal.style.display = 'flex';
+        
+        // Auto-fechar após 8 segundos
+        setTimeout(() => {
+            closeCopyModal();
+        }, 8000);
+    }
+    
+    function closeCopyModal() {
+        const modal = document.getElementById('copy-modal');
+        modal.style.display = 'none';
+    }
+    
+    // Fechar modal ao clicar fora
+    document.getElementById('copy-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeCopyModal();
+        }
+    });
+    
+    // Fechar com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeCopyModal();
+        }
+    });
+    
+    // Atualizar função copyPixCode
+    function copyPixCode() {
+        const pixCode = window.fullPixCode || currentPayment?.qr_code;
+        
+        if (!pixCode) {
+            // Mostrar erro no modal
+            showErrorModal('Código PIX não disponível');
+            return;
+        }
+        
+        console.log('📋 Copiando código PIX...');
+        
+        // Usar API moderna do clipboard
+        navigator.clipboard.writeText(pixCode)
+            .then(() => {
+                console.log('✅ Código copiado com sucesso!');
+                showCopyModal();
+                
+                // Destacar visualmente o container
+                const container = document.getElementById('qrcode-container');
+                if (container) {
+                    container.style.border = '2px solid #4CAF50';
+                    container.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.3)';
+                    setTimeout(() => {
+                        container.style.border = '';
+                        container.style.boxShadow = '';
+                    }, 2000);
+                }
+                
+                // Vibrar dispositivo (se suportado)
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
+                
+            })
+            .catch(err => {
+                console.error('❌ Erro ao copiar:', err);
+                
+                // Fallback para método antigo
+                const textarea = document.createElement('textarea');
+                textarea.value = pixCode;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                showCopyModal();
+            });
+    }
+    
+    // Função para mostrar modal de erro
+    function showErrorModal(message) {
+        const modal = document.getElementById('copy-modal');
+        const icon = modal.querySelector('.copy-modal-icon');
+        const title = modal.querySelector('h3');
+        const text = modal.querySelector('p');
+        
+        // Mudar para estilo de erro
+        icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+        icon.style.color = '#F44336';
+        title.textContent = 'Erro';
+        text.textContent = message;
+        
+        modal.style.display = 'flex';
+        
+        // Restaurar após fechar
+        setTimeout(() => {
+            closeCopyModal();
+            setTimeout(() => {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.style.color = '#4CAF50';
+                title.textContent = 'Código PIX Copiado!';
+                text.textContent = 'O código foi copiado para sua área de transferência.';
+            }, 300);
+        }, 3000);
+    }
+</script>
+
     <script>
         // Variáveis globais
         let currentPayment = null;
