@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Confirmado - Sucesso!</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✅</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-qrcode"></i>
+                <h1>PIX<span>Pay</span></h1>
+            </div>
+        </header>
+
+        <!-- Conteúdo Principal -->
+        <main class="success-container">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h1>Pagamento Confirmado!</h1>
+            <p class="success-message">Seu pagamento foi processado com sucesso.</p>
+            
+            <!-- Resumo da Compra -->
+            <div class="payment-summary">
+                <h2><i class="fas fa-receipt"></i> Resumo da Compra</h2>
+                
+                <div id="payment-details" class="details-grid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Carregando detalhes do pagamento...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="additional-info">
+                <div class="info-card">
+                    <i class="fas fa-envelope"></i>
+                    <h3>Comprovante por E-mail</h3>
+                    <p>O comprovante será enviado para o e-mail cadastrado</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Processamento Imediato</h3>
+                    <p>Seu pedido será processado em até 15 minutos</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-headset"></i>
+                    <h3>Suporte</h3>
+                    <p>Dúvidas? Entre em contato com nosso suporte</p>
+                </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="success-actions">
+                <button class="btn btn-primary" onclick="printReceipt()">
+                    <i class="fas fa-print"></i> Imprimir Comprovante
+                </button>
+                <button class="btn btn-secondary" onclick="goToProducts()">
+                    <i class="fas fa-store"></i> Continuar Comprando
+                </button>
+                <button class="btn btn-tertiary" onclick="goHome()">
+                    <i class="fas fa-home"></i> Página Inicial
+                </button>
+            </div>
+
+            <!-- Número do Pedido -->
+            <div class="order-number">
+                <p><strong>Número do Pedido:</strong> <span id="order-id">CARREGANDO...</span></p>
+                <p class="timestamp"><i class="fas fa-calendar"></i> <span id="payment-time">--:--</span></p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p><i class="fas fa-shield-alt"></i> Transação segura e criptografada</p>
+                <p class="support">Obrigado por confiar em nós! <i class="fas fa-heart"></i></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal de Impressão -->
+    <div id="print-modal" class="modal">
+        <div class="modal-content print-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-print"></i> Imprimir Comprovante</h3>
+                <button class="close-modal" onclick="closePrintModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="print-content">
+                <!-- Conteúdo para impressão será gerado aqui -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimir Agora
+                </button>
+                <button class="btn btn-secondary" onclick="closePrintModal()">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
+    <script>
+        // Carregar dados do pagamento
+        async function loadPaymentDetails() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const paymentId = urlParams.get('payment');
+                
+                // Tentar obter do localStorage primeiro
+                let paymentData = localStorage.getItem('lastPayment');
+                if (paymentData) {
+                    paymentData = JSON.parse(paymentData);
+                }
+                
+                if (paymentData) {
+                    displayPaymentDetails(paymentData);
+                } else {
+                    // Simular dados se não houver
+                    const mockData = {
+                        paymentId: paymentId || `ORD-${Date.now()}`,
+                        amount: 297.00,
+                        product: {
+                            name: "Curso de JavaScript",
+                            description: "Curso completo de JavaScript"
+                        },
+                        created_at: new Date().toISOString()
+                    };
+                    displayPaymentDetails(mockData);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar detalhes:', error);
+                displayPaymentDetails(null);
+            }
+        }
+
+        function displayPaymentDetails(data) {
+            if (!data) {
+                document.getElementById('payment-details').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Não foi possível carregar os detalhes do pagamento</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Formatar data
+            const paymentDate = new Date(data.created_at);
+            const formattedDate = paymentDate.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Atualizar elementos
+            document.getElementById('order-id').textContent = data.paymentId;
+            document.getElementById('payment-time').textContent = formattedDate;
+
+            // Exibir detalhes
+            document.getElementById('payment-details').innerHTML = `
+                <div class="detail-item">
+                    <span class="label">Produto:</span>
+                    <span class="value">${data.product?.name || 'Produto'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Descrição:</span>
+                    <span class="value">${data.product?.description || 'Descrição do produto'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Valor:</span>
+                    <span class="value price">R$ ${data.amount?.toFixed(2) || '0,00'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Método:</span>
+                    <span class="value method">PIX <i class="fas fa-qrcode"></i></span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Status:</span>
+                    <span class="value status approved">
+                        <i class="fas fa-check-circle"></i> Aprovado
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Data:</span>
+                    <span class="value">${formattedDate}</span>
+                </div>
+            `;
+        }
+
+        function printReceipt() {
+            const printContent = document.getElementById('print-content');
+            const details = document.getElementById('payment-details').innerHTML;
+            
+            printContent.innerHTML = `
+                <div class="receipt">
+                    <div class="receipt-header">
+                        <h2><i class="fas fa-qrcode"></i> PIXPay</h2>
+                        <p>Comprovante de Pagamento</p>
+                    </div>
+                    <div class="receipt-body">
+                        ${details}
+                    </div>
+                    <div class="receipt-footer">
+                        <p>Obrigado por sua compra!</p>
+                        <p class="small">Este é um comprovante digital válido.</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('print-modal').style.display = 'flex';
+        }
+
+        function closePrintModal() {
+            document.getElementById('print-modal').style.display = 'none';
+        }
+
+        function goToProducts() {
+            window.location.href = '/';
+        }
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        // Inicializar quando a página carregar
+        window.onload = loadPaymentDetails;
+
+        // Estilo para impressão
+        const style = document.createElement('style');
+        style.textContent = `
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                .print-modal, .print-modal * {
+                    visibility: visible;
+                }
+                .print-modal {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    background: white;
+                }
+                .modal-actions {
+                    display: none !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

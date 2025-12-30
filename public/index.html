@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de PIX - Pague qualquer valor</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+    <style>
+        :root {
+            --primary-color: #00BFA5;
+            --primary-dark: #00897B;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 18px;
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.1);
+        }
+
+/* Adicione estas regras no CSS existente */
+
+.input-with-icon input {
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    text-align: center;
+    letter-spacing: 1px;
+    color: #333;
+}
+
+.input-with-icon input::placeholder {
+    color: #aaa;
+    font-weight: 400;
+}
+
+/* Estilo para valor válido/inválido */
+.input-with-icon input.valid {
+    border-color: #4CAF50 !important;
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+.input-with-icon input.invalid {
+    border-color: #F44336 !important;
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Exemplos rápidos */
+.quick-examples {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.quick-example {
+    background: #f0f0f0;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-example:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.quick-example:active {
+    transform: translateY(0);
+}
+        
+        .currency-input {
+            font-size: 32px !important;
+            font-weight: 700 !important;
+            text-align: center;
+            padding: 20px !important;
+            color: #333;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .info-box i {
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+        
+        .range-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .btn-generate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 191, 165, 0.3);
+        }
+        
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .error-message i {
+            margin-right: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .currency-input {
+                font-size: 28px !important;
+                padding: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-qrcode"></i>
+            </div>
+            <h1>Gerador de PIX</h1>
+            <p>Pague qualquer valor instantaneamente</p>
+        </div>
+        
+        <!-- Conteúdo -->
+        <div class="content">
+            <!-- Mensagem de erro -->
+            <div id="error-message" class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="error-text"></span>
+            </div>
+            
+            <!-- Formulário -->
+            <div class="form-group">
+                <label for="amount">
+                    <i class="fas fa-money-bill-wave"></i> QUANTO VOCÊ DESEJA PAGAR?
+                </label>
+                <div class="input-with-icon">
+                    <span class="currency-symbol">R$</span>
+                    <input 
+                        type="text" 
+                        id="amount" 
+                        class="currency-input"
+                        placeholder="0,00"
+                        value="10,00"
+                    >
+                </div>
+                <div class="range-info">
+                    <span>Mínimo: R$ 0,01</span>
+                    <span>Máximo: R$ 99.999.999.999,99</span>
+                </div>
+            </div>
+            
+            <!-- Informações -->
+            <div class="info-box">
+                <p><i class="fas fa-bolt"></i> Pagamento instantâneo via PIX</p>
+                <p><i class="fas fa-shield-alt"></i> 100% seguro e criptografado</p>
+                <p><i class="fas fa-clock"></i> QR Code válido por 30 minutos</p>
+            </div>
+            
+            <!-- Botão de gerar -->
+            <button id="generate-btn" class="btn-generate" onclick="generatePix()">
+                <i class="fas fa-qrcode"></i> GERAR QR CODE PIX
+            </button>
+            
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Gerando seu QR Code PIX...</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Sistema de pagamento via PIX • Use qualquer valor entre R$ 0,01 e R$ 99.999.999.999,99</p>
+        </div>
+    </div>
+
+    <script>
+        // Elementos
+        const amountInput = document.getElementById('amount');
+        const generateBtn = document.getElementById('generate-btn');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        // Variável para armazenar valor numérico
+        let numericValue = 10.00;
+        
+        // Função para formatar número para exibição (R$ 1.234,56)
+        function formatToBrazilian(value) {
+            return value.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        // Função para converter string brasileira para número
+        function parseBrazilian(value) {
+            // Remove pontos de milhar, substitui vírgula decimal por ponto
+            const clean = value
+                .replace(/\./g, '')  // Remove pontos (1.234,56 -> 1234,56)
+                .replace(',', '.');   // Substitui vírgula por ponto (1234,56 -> 1234.56)
+            
+            const num = parseFloat(clean);
+            return isNaN(num) ? 0 : num;
+        }
+        
+        // Atualizar display quando usuário digita
+        amountInput.addEventListener('input', function(e) {
+            // Pega o valor atual
+            let rawValue = e.target.value;
+            
+            // Permite apenas números, vírgula e ponto
+            rawValue = rawValue.replace(/[^\d,.]/g, '');
+            
+            // Se começar com vírgula ou ponto, adiciona 0 antes
+            if (rawValue.startsWith(',') || rawValue.startsWith('.')) {
+                rawValue = '0' + rawValue;
+            }
+            
+            // Se tiver vírgula E ponto, remove um deles
+            if (rawValue.includes(',') && rawValue.includes('.')) {
+                // Mantém o último separador como decimal
+                const lastComma = rawValue.lastIndexOf(',');
+                const lastDot = rawValue.lastIndexOf('.');
+                const lastSeparator = Math.max(lastComma, lastDot);
+                
+                // Remove todos os separadores após o primeiro
+                const before = rawValue.substring(0, lastSeparator).replace(/[,.]/g, '');
+                const after = rawValue.substring(lastSeparator + 1).replace(/\D/g, '');
+                
+                // Limita a 2 casas decimais
+                const decimals = after.substring(0, 2);
+                rawValue = before + (lastSeparator === lastComma ? ',' : '.') + decimals;
+            }
+            
+            // Se não tiver separador decimal e tiver mais de 2 dígitos,
+            // assume que os últimos 2 são centavos
+            if (!rawValue.includes(',') && !rawValue.includes('.') && rawValue.length > 2) {
+                const reais = rawValue.slice(0, -2);
+                const centavos = rawValue.slice(-2);
+                rawValue = reais + ',' + centavos;
+            }
+            
+            // Atualiza o campo
+            e.target.value = rawValue;
+            
+            // Converte para número
+            numericValue = parseBrazilian(rawValue);
+            
+            // Valida
+            validateAmount(numericValue);
+        });
+        
+        // Formata bonito quando perde o foco
+        amountInput.addEventListener('blur', function() {
+            if (numericValue > 0) {
+                this.value = formatToBrazilian(numericValue);
+            }
+        });
+        
+        // Formata bonito quando ganha foco
+        amountInput.addEventListener('focus', function() {
+            this.select();
+        });
+        
+        // Validação
+        function validateAmount(amount) {
+            if (amount < 0.01) {
+                showError('Valor mínimo é R$ 0,01');
+                generateBtn.disabled = true;
+                return false;
+            }
+            
+            if (amount > 99999999999.99) {
+                showError('Valor máximo é R$ 99.999.999.999,99');
+                generateBtn.disabled = true;
+                return false;
+            }
+            
+            hideError();
+            generateBtn.disabled = false;
+            return true;
+        }
+        
+        // Mensagens de erro
+        function showError(message) {
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+            generateBtn.disabled = true;
+        }
+        
+        function hideError() {
+            errorDiv.style.display = 'none';
+            generateBtn.disabled = false;
+        }
+        
+        // Botões de exemplo rápido (opcional)
+        function setExampleAmount(amount) {
+            amountInput.value = formatToBrazilian(amount);
+            numericValue = amount;
+            validateAmount(amount);
+            amountInput.focus();
+            amountInput.select();
+        }
+        
+        // Gerar PIX
+        async function generatePix() {
+            if (!validateAmount(numericValue)) {
+                return;
+            }
+            
+            generateBtn.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                // Salva o valor
+                localStorage.setItem('pixAmount', numericValue.toFixed(2));
+                
+                // Redireciona
+                setTimeout(() => {
+                    window.location.href = `/checkout?amount=${numericValue.toFixed(2)}`;
+                }, 500);
+                
+            } catch (error) {
+                showError('Erro ao processar. Tente novamente.');
+                generateBtn.style.display = 'flex';
+                loadingDiv.style.display = 'none';
+            }
+        }
+        
+        // Event Listeners
+        generateBtn.addEventListener('click', generatePix);
+        
+        amountInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generatePix();
+            }
+        });
+        
+        // Inicialização
+        window.onload = function() {
+            // Carrega valor salvo ou usa padrão
+            const saved = localStorage.getItem('pixAmount');
+            if (saved) {
+                numericValue = parseFloat(saved);
+                if (numericValue >= 0.01) {
+                    amountInput.value = formatToBrazilian(numericValue);
+                }
+            }
+            
+            // Valida
+            validateAmount(numericValue);
+            
+            // Foca no input
+            setTimeout(() => {
+                amountInput.focus();
+                amountInput.select();
+            }, 100);
+            
+            // Adiciona botões de exemplo (opcional)
+            addExampleButtons();
+        };
+        
+        // Função para adicionar botões de exemplo (opcional)
+        function addExampleButtons() {
+            const examples = [
+                { label: 'R$ 0,01', value: 0.01 },
+                { label: 'R$ 1,00', value: 1.00 },
+                { label: 'R$ 10,00', value: 10.00 },
+                { label: 'R$ 100,00', value: 100.00 },
+                { label: 'R$ 1.000,00', value: 1000.00 }
+            ];
+            
+            const container = document.createElement('div');
+            container.className = 'quick-examples';
+            container.style.cssText = `
+                display: flex;
+                gap: 8px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            `;
+            
+            examples.forEach(example => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = example.label;
+                button.style.cssText = `
+                    background: #f0f0f0;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 15px;
+                    font-size: 13px;
+                    color: #666;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                button.onmouseover = () => {
+                    button.style.background = '#e0e0e0';
+                    button.style.transform = 'translateY(-2px)';
+                };
+                
+                button.onmouseout = () => {
+                    button.style.background = '#f0f0f0';
+                    button.style.transform = 'translateY(0)';
+                };
+                
+                button.onclick = () => setExampleAmount(example.value);
+                
+                container.appendChild(button);
+            });
+            
+            // Insere após o input
+            amountInput.parentNode.parentNode.appendChild(container);
+        }
+        
+        // TESTE: Adicione esta função para debug
+        function testInput() {
+            console.log('🧪 Testando entradas:');
+            
+            const testCases = [
+                { input: '001', expected: 0.01 },
+                { input: '1000', expected: 10.00 },
+                { input: '200,50', expected: 200.50 },
+                { input: '200.50', expected: 200.50 },
+                { input: '10000000', expected: 100000.00 },
+                { input: '1234567,89', expected: 1234567.89 }
+            ];
+            
+            testCases.forEach(test => {
+                const result = parseBrazilian(test.input);
+                const passed = Math.abs(result - test.expected) < 0.01;
+                console.log(`${test.input} -> ${result} ${passed ? '✅' : '❌'} (esperado: ${test.expected})`);
+            });
+        }
+        
+        // Executa teste ao carregar (pode remover depois)
+        setTimeout(testInput, 1000);
+    </script>
+</body>
+</html>
