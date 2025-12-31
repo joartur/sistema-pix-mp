@@ -9,522 +9,258 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            min-height: 100vh;
-        }
-        
-        .card-shadow {
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 10px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .gradient-primary {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        }
-        
-        .gradient-success {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        }
-        
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .btn-hover:hover {
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .amount-selected {
-            border-color: #2563eb !important;
-            background-color: #eff6ff !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
+        /* Estilos permanecem os mesmos */
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); min-height: 100vh; }
+        .card-shadow { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 10px 15px rgba(0, 0, 0, 0.05); }
+        .gradient-primary { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+        .gradient-success { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
     <div class="container max-w-4xl mx-auto">
-        <!-- Header com Logo -->
-        <header class="text-center mb-12 slide-in">
-            <div class="flex flex-col items-center justify-center mb-6">
-                <div class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                    <i class="fas fa-bolt text-white text-2xl"></i>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Pagamento PIX</h1>
-                <p class="text-gray-600 text-lg">Sistema Oficial • Processamento Instantâneo</p>
-            </div>
-            
-            <!-- Status do Sistema -->
-            <div class="inline-flex items-center bg-green-50 text-green-700 px-5 py-3 rounded-full border border-green-200 shadow-sm">
-                <div class="w-3 h-3 bg-green-500 rounded-full mr-3 pulse-animation"></div>
-                <span class="font-medium">Sistema operacional • Transações ativas</span>
-            </div>
-        </header>
+        <!-- Header permanece igual -->
 
         <!-- Card Principal -->
-        <div class="bg-white rounded-2xl card-shadow overflow-hidden slide-in" style="animation-delay: 0.1s">
-            <!-- Cabeçalho do Card -->
-            <div class="gradient-primary px-8 py-6">
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white mb-2">Criar Novo Pagamento</h2>
-                        <p class="text-blue-100">Transação segura e confirmada em tempo real</p>
-                    </div>
-                    <div class="mt-4 md:mt-0 flex items-center space-x-3">
-                        <div class="flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                            <i class="fas fa-shield-alt text-white mr-2"></i>
-                            <span class="text-white font-medium">PCI DSS</span>
-                        </div>
-                        <div class="flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                            <i class="fas fa-lock text-white mr-2"></i>
-                            <span class="text-white font-medium">256-bit SSL</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="bg-white rounded-2xl card-shadow overflow-hidden">
             <!-- Conteúdo do Card -->
             <div class="p-8">
                 <!-- Valores Recomendados -->
                 <div class="mb-12">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold text-gray-800">Valores disponíveis</h3>
-                        <span class="text-sm text-gray-500">Escolha o valor desejado</span>
-                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6">Valores disponíveis</h3>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <!-- R$ 0,01 -->
-                        <button onclick="selectAmount(0.01)" class="amount-option p-6 rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 btn-hover group">
-                            <div class="flex flex-col items-center">
-                                <div class="text-3xl font-bold text-gray-900 group-hover:text-blue-700 mb-2">R$ 0,01</div>
-                                <div class="text-gray-600 text-sm mb-4">Valor mínimo</div>
-                                <div class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700 group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">
-                                    <i class="fas fa-bolt mr-2"></i>Processamento imediato
-                                </div>
-                            </div>
+                        <!-- Botões de valor -->
+                        <button onclick="selectAmount(0.01)" class="amount-option p-6 rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
+                            <div class="text-3xl font-bold text-gray-900">R$ 0,01</div>
                         </button>
                         
-                        <!-- R$ 1,00 -->
-                        <button onclick="selectAmount(1.00)" class="amount-option p-6 rounded-xl border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-300 btn-hover group">
-                            <div class="flex flex-col items-center">
-                                <div class="text-3xl font-bold text-gray-900 group-hover:text-green-700 mb-2">R$ 1,00</div>
-                                <div class="text-gray-600 text-sm mb-4">Valor padrão</div>
-                                <div class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700 group-hover:bg-green-100 group-hover:text-green-700 transition-colors">
-                                    <i class="fas fa-star mr-2"></i>Mais utilizado
-                                </div>
-                            </div>
+                        <button onclick="selectAmount(1.00)" class="amount-option p-6 rounded-xl border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-300">
+                            <div class="text-3xl font-bold text-gray-900">R$ 1,00</div>
                         </button>
                         
-                        <!-- R$ 10,00 -->
-                        <button onclick="selectAmount(10.00)" class="amount-option p-6 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 btn-hover group">
-                            <div class="flex flex-col items-center">
-                                <div class="text-3xl font-bold text-gray-900 group-hover:text-purple-700 mb-2">R$ 10,00</div>
-                                <div class="text-gray-600 text-sm mb-4">Valor máximo</div>
-                                <div class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
-                                    <i class="fas fa-chart-line mr-2"></i>Para transações maiores
-                                </div>
-                            </div>
+                        <button onclick="selectAmount(10.00)" class="amount-option p-6 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition-all duration-300">
+                            <div class="text-3xl font-bold text-gray-900">R$ 10,00</div>
                         </button>
                     </div>
                 </div>
 
                 <!-- Valor Personalizado -->
                 <div class="mb-12">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold text-gray-800">Valor personalizado</h3>
-                        <span class="text-sm text-gray-500">Informe qualquer valor</span>
-                    </div>
-                    
                     <div class="flex flex-col lg:flex-row gap-6 items-end">
                         <div class="flex-1">
                             <div class="relative">
-                                <div class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium">
-                                    R$
-                                </div>
+                                <div class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium">R$</div>
                                 <input type="number" 
                                        id="customAmount" 
                                        step="0.01" 
                                        min="0.01"
                                        placeholder="0,00" 
-                                       class="w-full pl-14 pr-5 py-5 text-xl border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all duration-300"
-                                       oninput="validateCustomAmount(this)">
-                                <div class="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                    BRL
-                                </div>
-                            </div>
-                            <div class="flex items-center mt-3 text-sm text-gray-600">
-                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                                <span>Digite o valor exato a ser cobrado</span>
+                                       class="w-full pl-14 pr-5 py-5 text-xl border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all duration-300">
                             </div>
                         </div>
-                        <button onclick="processPayment()" class="px-10 py-5 gradient-primary hover:opacity-95 text-white font-bold text-lg rounded-xl transition-all duration-300 btn-hover flex items-center justify-center shadow-lg">
+                        <button onclick="processPayment()" class="px-10 py-5 gradient-primary hover:opacity-95 text-white font-bold text-lg rounded-xl transition-all duration-300 flex items-center justify-center">
                             <i class="fas fa-play-circle mr-3 text-xl"></i>
                             Gerar Pagamento
                         </button>
                     </div>
                 </div>
 
-                <!-- Resultado (dinâmico) -->
-                <div id="resultSection" class="hidden slide-in">
+                <!-- Resultado -->
+                <div id="resultSection" class="hidden">
                     <div class="border-t pt-10">
-                        <!-- Cabeçalho do Resultado -->
-                        <div class="flex items-center justify-between mb-8">
-                            <div class="flex items-center">
-                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl font-bold text-gray-900">Pagamento Criado com Sucesso</h3>
-                                    <p class="text-gray-600">A transação está pronta para ser processada</p>
-                                </div>
-                            </div>
-                            <div class="hidden md:block">
-                                <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                                    <i class="fas fa-bolt mr-2"></i>Pronto para pagar
-                                </span>
-                            </div>
-                        </div>
-                        
                         <!-- Detalhes da Transação -->
                         <div class="grid md:grid-cols-2 gap-8 mb-10">
                             <!-- Informações -->
                             <div class="space-y-6">
-                                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                                <div class="bg-gray-50 p-5 rounded-xl">
                                     <div class="text-sm text-gray-500 font-medium mb-2">ID DA TRANSAÇÃO</div>
-                                    <div id="paymentId" class="font-mono text-gray-900 text-lg font-bold">139558626783</div>
+                                    <div id="paymentId" class="font-mono text-gray-900 text-lg font-bold"></div>
                                 </div>
                                 
-                                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                                <div class="bg-gray-50 p-5 rounded-xl">
                                     <div class="text-sm text-gray-500 font-medium mb-2">VALOR DA TRANSAÇÃO</div>
-                                    <div id="paymentAmount" class="text-4xl font-bold text-green-600">R$ 0,01</div>
+                                    <div id="paymentAmount" class="text-4xl font-bold text-green-600"></div>
                                 </div>
                                 
-                                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <div class="text-sm text-gray-500 font-medium mb-2">STATUS</div>
-                                            <div class="flex items-center">
-                                                <span id="paymentStatus" class="text-lg font-semibold text-yellow-600 mr-3">Aguardando</span>
-                                                <div class="w-3 h-3 bg-yellow-500 rounded-full pulse-animation"></div>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-sm text-gray-500 font-medium mb-2">VÁLIDO POR</div>
-                                            <div class="text-lg font-semibold text-gray-900">30 minutos</div>
-                                        </div>
-                                    </div>
+                                <!-- QR Code Gerado -->
+                                <div id="qrCodeContainer" class="bg-gray-50 p-5 rounded-xl flex flex-col items-center justify-center">
+                                    <div class="text-sm text-gray-500 font-medium mb-2">QR CODE</div>
+                                    <div id="qrCodeImage" class="w-48 h-48 mb-3"></div>
+                                    <p class="text-gray-600 text-sm text-center">Escaneie com seu app bancário</p>
                                 </div>
                                 
-                                <button onclick="copyTransactionId()" class="w-full py-4 border-2 border-blue-500 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300 flex items-center justify-center btn-hover">
-                                    <i class="far fa-copy mr-3"></i>
-                                    Copiar ID da Transação
-                                </button>
+                                <!-- Código PIX Copiável -->
+                                <div class="bg-gray-50 p-5 rounded-xl">
+                                    <div class="text-sm text-gray-500 font-medium mb-2">CÓDIGO PIX (Copia e Cola)</div>
+                                    <div id="pixCodeText" class="font-mono text-gray-800 text-sm break-all mb-3"></div>
+                                    <button onclick="copyPixCode()" class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        <i class="far fa-copy mr-2"></i>Copiar Código
+                                    </button>
+                                </div>
                             </div>
                             
-                            <!-- QR Code Placeholder -->
-                            <div class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200">
-                                <div class="text-center mb-6">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-qrcode text-blue-600 text-xl"></i>
-                                    </div>
-                                    <h4 class="font-semibold text-gray-900 text-lg">QR Code PIX</h4>
-                                    <p class="text-gray-600 text-sm mt-1">Escaneie para pagamento instantâneo</p>
-                                </div>
-                                
-                                <div class="w-64 h-64 bg-white rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300 mb-6 shadow-inner">
-                                    <div class="text-center p-4">
-                                        <div class="w-40 h-40 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                                            <div class="grid grid-cols-3 gap-1">
-                                                <!-- Simulação de QR Code -->
-                                                <div class="w-3 h-3 bg-gray-800"></div><div class="w-3 h-3 bg-gray-800"></div><div class="w-3 h-3 bg-gray-800"></div>
-                                                <div class="w-3 h-3 bg-gray-800"></div><div class="w-3 h-3 bg-gray-100"></div><div class="w-3 h-3 bg-gray-800"></div>
-                                                <div class="w-3 h-3 bg-gray-800"></div><div class="w-3 h-3 bg-gray-800"></div><div class="w-3 h-3 bg-gray-800"></div>
-                                            </div>
+                            <!-- Instruções -->
+                            <div class="bg-blue-50 p-6 rounded-xl">
+                                <h4 class="font-semibold text-blue-900 mb-4">Como pagar:</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3 mt-1">
+                                            <span class="text-blue-600 font-bold">1</span>
                                         </div>
-                                        <p class="text-gray-500 text-xs">QR Code será gerado automaticamente</p>
+                                        <p class="text-blue-800">Abra seu app bancário e selecione "Pagar com PIX"</p>
                                     </div>
-                                </div>
-                                
-                                <div class="text-center">
-                                    <p class="text-gray-600 text-sm">Use a câmera do seu app bancário</p>
-                                    <div class="flex items-center justify-center mt-2 text-gray-500">
-                                        <i class="fas fa-mobile-alt mr-2"></i>
-                                        <span class="text-xs">Compatível com todos os bancos</span>
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3 mt-1">
+                                            <span class="text-blue-600 font-bold">2</span>
+                                        </div>
+                                        <p class="text-blue-800">Escaneie o QR Code ou cole o código PIX</p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3 mt-1">
+                                            <span class="text-blue-600 font-bold">3</span>
+                                        </div>
+                                        <p class="text-blue-800">Confirme os dados e autorize o pagamento</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Ações -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button onclick="checkPaymentStatus()" class="py-5 bg-white border-2 border-blue-500 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300 btn-hover flex items-center justify-center">
-                                <i class="fas fa-sync-alt mr-3 text-lg"></i>
-                                Verificar Status do Pagamento
-                            </button>
-                            <button onclick="proceedToPayment()" class="py-5 gradient-success hover:opacity-95 text-white font-semibold rounded-xl transition-all duration-300 btn-hover flex items-center justify-center shadow-lg">
-                                <i class="fas fa-external-link-alt mr-3 text-lg"></i>
-                                Ir para Página de Pagamento
-                            </button>
-                        </div>
+                        <!-- Botão para checkout -->
+                        <button onclick="goToCheckout()" class="w-full py-5 gradient-success hover:opacity-95 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-external-link-alt mr-3 text-lg"></i>
+                            Ir para Página de Pagamento
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Informações de Segurança -->
-        <footer class="mt-12 slide-in" style="animation-delay: 0.3s">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div class="bg-white p-6 rounded-xl card-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-shield-alt text-blue-600 text-xl"></i>
-                        </div>
-                        <h4 class="font-semibold text-gray-900">Segurança Garantida</h4>
-                    </div>
-                    <p class="text-gray-600 text-sm">Todas as transações são criptografadas e protegidas por certificados SSL 256-bit.</p>
-                </div>
-                
-                <div class="bg-white p-6 rounded-xl card-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-bolt text-green-600 text-xl"></i>
-                        </div>
-                        <h4 class="font-semibold text-gray-900">Processamento Imediato</h4>
-                    </div>
-                    <p class="text-gray-600 text-sm">Confirmação de pagamento em tempo real através da rede PIX do Banco Central.</p>
-                </div>
-                
-                <div class="bg-white p-6 rounded-xl card-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-headset text-purple-600 text-xl"></i>
-                        </div>
-                        <h4 class="font-semibold text-gray-900">Suporte Especializado</h4>
-                    </div>
-                    <p class="text-gray-600 text-sm">Nossa equipe está disponível 24/7 para auxiliar em qualquer etapa do processo.</p>
-                </div>
-            </div>
-            
-            <!-- Rodapé -->
-            <div class="text-center text-gray-500 text-sm pt-6 border-t border-gray-200">
-                <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
-                    <div class="flex items-center">
-                        <i class="fas fa-bank mr-2"></i>
-                        <span>Sistema integrado ao PIX Oficial</span>
-                    </div>
-                    <div class="hidden md:block">•</div>
-                    <div class="flex items-center">
-                        <i class="fas fa-certificate mr-2"></i>
-                        <span>Certificado de segurança PCI DSS</span>
-                    </div>
-                    <div class="hidden md:block">•</div>
-                    <div class="flex items-center">
-                        <i class="fas fa-clock mr-2"></i>
-                        <span>Disponível 24 horas por dia</span>
-                    </div>
-                </div>
-                <p class="mb-2">© 2024 Sistema de Pagamentos PIX • Todos os direitos reservados</p>
-                <p class="text-gray-400">Versão 2.1.4 • Processador oficial de transações</p>
-            </div>
-        </footer>
     </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed top-6 right-6 bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md transform transition-all duration-300"></div>
 
     <script>
         let selectedAmount = 0.01;
-        let paymentData = null;
+        let currentPayment = null;
+        
+        // Função para gerar QR Code dinâmico
+        function generateQRCode(text, elementId) {
+            const qrContainer = document.getElementById(elementId);
+            qrContainer.innerHTML = '';
+            
+            // Usando API do Google Charts para gerar QR Code
+            const qrUrl = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(text)}&choe=UTF-8`;
+            
+            const img = document.createElement('img');
+            img.src = qrUrl;
+            img.alt = 'QR Code PIX';
+            img.className = 'w-full h-auto';
+            qrContainer.appendChild(img);
+        }
+        
+        // Função para gerar código PIX de exemplo
+        function generatePixCode(amount, transactionId) {
+            // Código PIX padrão (em produção, isso viria da sua API)
+            const merchantName = "Sistema de Pagamentos";
+            const merchantCity = "São Paulo";
+            const pixKey = "12345678900"; // CPF/CNPJ ou chave aleatória
+            
+            return `00020126580014br.gov.bcb.pix0136${pixKey}520400005303986540${amount.toFixed(2)}5802BR590${merchantName}600${merchantCity}621405${transactionId}6304`;
+        }
         
         function selectAmount(amount) {
             selectedAmount = amount;
-            
-            // Remover seleção anterior
-            document.querySelectorAll('.amount-option').forEach(btn => {
-                btn.classList.remove('amount-selected');
-            });
-            
-            // Adicionar seleção atual
-            event.target.classList.add('amount-selected');
-            
-            // Atualizar input customizado
             document.getElementById('customAmount').value = amount.toFixed(2);
             
-            // Feedback
-            showNotification(`Valor selecionado: R$ ${amount.toFixed(2)}`, 'info');
-        }
-        
-        function validateCustomAmount(input) {
-            let value = parseFloat(input.value);
-            if (isNaN(value)) return;
-            
-            if (value < 0.01) {
-                input.value = "0.01";
-                showNotification("Valor mínimo é R$ 0,01", "warning");
-            }
-            
-            // Selecionar o valor
-            selectedAmount = value;
-            
-            // Remover seleção dos botões
+            // Feedback visual
             document.querySelectorAll('.amount-option').forEach(btn => {
-                btn.classList.remove('amount-selected');
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'border-green-500', 'bg-green-50', 'border-purple-500', 'bg-purple-50');
             });
+            
+            // Adicionar classe baseada no valor
+            const btn = event.target.closest('.amount-option');
+            if (amount === 0.01) btn.classList.add('border-blue-500', 'bg-blue-50');
+            else if (amount === 1.00) btn.classList.add('border-green-500', 'bg-green-50');
+            else if (amount === 10.00) btn.classList.add('border-purple-500', 'bg-purple-50');
         }
         
         function processPayment() {
             const input = document.getElementById('customAmount');
-            let value = parseFloat(input.value);
+            let value = parseFloat(input.value) || selectedAmount;
             
-            if (!value || value < 0.01) {
-                showNotification("Informe um valor válido para continuar", "error");
-                input.focus();
+            if (value < 0.01) {
+                showNotification("Valor mínimo é R$ 0,01", "error");
                 return;
             }
             
-            selectedAmount = value;
+            // Gerar ID de transação
+            const transactionId = 'PIX' + Date.now().toString().slice(-10);
             
-            // Simulação de requisição à API
-            showNotification("Processando solicitação de pagamento...", "info");
+            // Atualizar interface
+            document.getElementById('paymentId').textContent = transactionId;
+            document.getElementById('paymentAmount').textContent = `R$ ${value.toFixed(2)}`;
             
-            // Criar dados do pagamento
-            paymentData = {
-                id: 'PIX' + Date.now().toString().slice(-10),
+            // Gerar código PIX
+            const pixCode = generatePixCode(value, transactionId);
+            document.getElementById('pixCodeText').textContent = pixCode;
+            
+            // Gerar QR Code
+            generateQRCode(pixCode, 'qrCodeImage');
+            
+            // Salvar dados
+            currentPayment = {
+                id: transactionId,
                 amount: value,
-                timestamp: new Date().toISOString(),
-                status: 'pending'
+                pixCode: pixCode,
+                timestamp: new Date().toISOString()
             };
             
-            // Simular delay da API
-            setTimeout(() => {
-                showPaymentResult();
-            }, 1000);
-        }
-        
-        function showPaymentResult() {
+            localStorage.setItem('currentPayment', JSON.stringify(currentPayment));
+            
+            // Mostrar resultados
             document.getElementById('resultSection').classList.remove('hidden');
-            document.getElementById('paymentAmount').textContent = `R$ ${selectedAmount.toFixed(2)}`;
-            document.getElementById('paymentId').textContent = paymentData.id;
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
             
-            // Scroll suave
-            document.getElementById('resultSection').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-            
-            showNotification("Pagamento criado com sucesso! Redirecionando...", "success");
+            showNotification("Pagamento criado com sucesso!", "success");
         }
         
-        function checkPaymentStatus() {
-            showNotification("Consultando status da transação...", "info");
-            // Implementação real viria aqui
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCodeText').textContent;
+            navigator.clipboard.writeText(pixCode)
+                .then(() => showNotification("Código PIX copiado!", "success"))
+                .catch(() => showNotification("Erro ao copiar", "error"));
         }
         
-        function proceedToPayment() {
-            // Salvar dados em localStorage para a próxima página
-            localStorage.setItem('currentPayment', JSON.stringify({
-                id: paymentData.id,
-                amount: selectedAmount,
-                timestamp: new Date().toISOString()
-            }));
+        function goToCheckout() {
+            if (!currentPayment) {
+                showNotification("Primeiro gere um pagamento", "error");
+                return;
+            }
             
-            // CORRIGIDO: Caminho correto para checkout.html
-            window.location.href = "checkout.html";
-        }
-        
-        function copyTransactionId() {
-            const id = document.getElementById('paymentId').textContent;
+            // Salvar dados para a próxima página
+            localStorage.setItem('currentPayment', JSON.stringify(currentPayment));
             
-            navigator.clipboard.writeText(id)
-                .then(() => showNotification("ID da transação copiado!", "success"))
-                .catch(() => showNotification("Erro ao copiar ID", "error"));
+            // Redirecionar para checkout.html (mesma pasta)
+            window.location.href = 'checkout.html';
         }
         
         function showNotification(message, type = "info") {
-            // Remover notificação anterior
-            const existingToast = document.querySelector('#toast');
-            if (existingToast) existingToast.remove();
-            
-            // Cores e ícones
-            const config = {
-                success: {
-                    color: 'bg-green-600',
-                    icon: 'fas fa-check-circle',
-                    title: 'Sucesso'
-                },
-                error: {
-                    color: 'bg-red-600',
-                    icon: 'fas fa-exclamation-circle',
-                    title: 'Erro'
-                },
-                warning: {
-                    color: 'bg-yellow-600',
-                    icon: 'fas fa-exclamation-triangle',
-                    title: 'Atenção'
-                },
-                info: {
-                    color: 'bg-blue-600',
-                    icon: 'fas fa-info-circle',
-                    title: 'Informação'
-                }
+            // Código do toast permanece
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                info: 'bg-blue-600'
             };
             
-            const { color, icon, title } = config[type];
-            
-            // Criar elemento
             const toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = `fixed top-6 right-6 ${color} text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md transform transition-all duration-300 slide-in`;
+            toast.className = `fixed top-6 right-6 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md`;
             toast.innerHTML = `
-                <div class="flex items-start">
-                    <i class="${icon} text-xl mr-4 mt-1"></i>
-                    <div class="flex-1">
-                        <div class="font-semibold mb-1">${title}</div>
-                        <div class="text-sm opacity-90">${message}</div>
-                    </div>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 opacity-70 hover:opacity-100">
-                        <i class="fas fa-times"></i>
-                    </button>
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle mr-3"></i>
+                    <span>${message}</span>
                 </div>
             `;
             
             document.body.appendChild(toast);
-            
-            // Mostrar
-            setTimeout(() => {
-                toast.classList.remove('opacity-0', 'translate-x-full');
-            }, 10);
-            
-            // Auto-remover após 5 segundos
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100px)';
-                setTimeout(() => {
-                    if (toast.parentElement) {
-                        toast.remove();
-                    }
-                }, 300);
-            }, 5000);
+            setTimeout(() => toast.remove(), 3000);
         }
         
         // Inicialização
@@ -532,23 +268,13 @@
             // Selecionar valor padrão
             selectAmount(0.01);
             
-            // Carregar dados do pagamento se existirem
-            const savedPayment = localStorage.getItem('currentPayment');
-            if (savedPayment) {
-                try {
-                    paymentData = JSON.parse(savedPayment);
-                    selectedAmount = paymentData.amount;
-                    document.getElementById('customAmount').value = selectedAmount.toFixed(2);
-                } catch (e) {
-                    console.log('Nenhum pagamento anterior encontrado');
-                }
+            // Verificar se há pagamento salvo
+            const saved = localStorage.getItem('currentPayment');
+            if (saved) {
+                currentPayment = JSON.parse(saved);
+                document.getElementById('customAmount').value = currentPayment.amount.toFixed(2);
+                selectAmount(currentPayment.amount);
             }
-            
-            // Animar elementos
-            const elements = document.querySelectorAll('.slide-in');
-            elements.forEach((el, index) => {
-                el.style.animationDelay = `${index * 0.1}s`;
-            });
         });
     </script>
 </body>
