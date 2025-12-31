@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de PIX • Pagamentos Instantâneos</title>
+    <title>Gerar Pagamento PIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,17 +13,12 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
         }
         
         .card-shadow {
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 10px 20px rgba(0, 0, 0, 0.05);
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
         }
         
         .primary-gradient {
@@ -72,28 +67,29 @@
     </style>
 </head>
 <body class="flex items-center justify-center p-4 md:p-6">
-    <div class="container max-w-6xl mx-auto">
+    <div class="container max-w-4xl mx-auto">
         <!-- Header -->
-        <header class="text-center mb-12 slide-in">
+        <header class="text-center mb-10 slide-in">
             <div class="flex flex-col items-center mb-6">
                 <div class="w-16 h-16 primary-gradient rounded-2xl flex items-center justify-center mb-4 shadow-lg">
                     <i class="fas fa-bolt text-white text-2xl"></i>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-3">Gerador de PIX</h1>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Gere pagamentos instantâneos com segurança e praticidade
-                </p>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-3">Pagamento PIX</h1>
+                <p class="text-xl text-gray-600">Pagamentos instantâneos e seguros</p>
             </div>
         </header>
 
         <!-- Main Card -->
-        <div class="glass-effect rounded-3xl card-shadow overflow-hidden slide-in" style="animation-delay: 0.1s">
+        <div class="bg-white rounded-3xl card-shadow overflow-hidden slide-in" style="animation-delay: 0.1s">
             <!-- Card Header -->
             <div class="primary-gradient px-8 py-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold text-white mb-2">Criar Novo Pagamento PIX</h2>
-                        <p class="text-blue-100">Transações seguras e instantâneas</p>
+                        <h2 class="text-2xl font-bold text-white">Informe o valor do pagamento</h2>
+                        <p class="text-blue-100 text-sm mt-1">Gere um QR Code PIX em segundos</p>
+                    </div>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-coins text-white"></i>
                     </div>
                 </div>
             </div>
@@ -101,225 +97,114 @@
             <!-- Card Body -->
             <div class="p-8">
                 <!-- Valor Options -->
-                <div class="mb-12">
-                    <div class="flex items-center mb-6">
-                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
-                            <i class="fas fa-coins text-blue-600"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Selecione o valor do pagamento</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <!-- R$ 0,01 -->
+                <div class="mb-10">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Valores sugeridos</h3>
+                    <div class="grid grid-cols-3 gap-4">
                         <button onclick="selectAmount(0.01)" 
-                                class="amount-btn group p-6 rounded-2xl border-2 border-gray-100 hover:border-blue-500 hover:shadow-lg transition-all duration-300 btn-hover">
+                                class="amount-btn group p-4 rounded-xl border-2 border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
                             <div class="flex flex-col items-center">
-                                <div class="text-3xl font-bold text-gray-900 group-hover:text-blue-600 mb-2">R$ 0,01</div>
-                                <div class="text-gray-500 text-sm mb-4 group-hover:text-blue-500">Valor mínimo</div>
+                                <div class="text-xl font-bold text-gray-900 group-hover:text-blue-600">R$ 0,01</div>
+                                <div class="text-gray-500 text-xs mt-1">Mínimo</div>
                             </div>
                         </button>
                         
-                        <!-- R$ 1,00 -->
                         <button onclick="selectAmount(1.00)" 
-                                class="amount-btn group p-6 rounded-2xl border-2 border-gray-100 hover:border-emerald-500 hover:shadow-lg transition-all duration-300 btn-hover">
+                                class="amount-btn group p-4 rounded-xl border-2 border-gray-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300">
                             <div class="flex flex-col items-center">
-                                <div class="text-3xl font-bold text-gray-900 group-hover:text-emerald-600 mb-2">R$ 1,00</div>
-                                <div class="text-gray-500 text-sm mb-4 group-hover:text-emerald-500">Valor recomendado</div>
+                                <div class="text-xl font-bold text-gray-900 group-hover:text-emerald-600">R$ 1,00</div>
+                                <div class="text-gray-500 text-xs mt-1">Recomendado</div>
                             </div>
                         </button>
                         
-                        <!-- R$ 10,00 -->
                         <button onclick="selectAmount(10.00)" 
-                                class="amount-btn group p-6 rounded-2xl border-2 border-gray-100 hover:border-purple-500 hover:shadow-lg transition-all duration-300 btn-hover">
+                                class="amount-btn group p-4 rounded-xl border-2 border-gray-100 hover:border-purple-500 hover:bg-purple-50 transition-all duration-300">
                             <div class="flex flex-col items-center">
-                                <div class="text-3xl font-bold text-gray-900 group-hover:text-purple-600 mb-2">R$ 10,00</div>
-                                <div class="text-gray-500 text-sm mb-4 group-hover:text-purple-500">Para transações maiores</div>
+                                <div class="text-xl font-bold text-gray-900 group-hover:text-purple-600">R$ 10,00</div>
+                                <div class="text-gray-500 text-xs mt-1">Popular</div>
                             </div>
                         </button>
                     </div>
                 </div>
 
                 <!-- Valor Customizado -->
-                <div class="mb-10">
-                    <div class="flex items-center mb-6">
-                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
-                            <i class="fas fa-edit text-blue-600"></i>
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Ou digite outro valor</h3>
+                    
+                    <div class="relative mb-6">
+                        <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                            <span class="text-xl font-bold text-gray-400">R$</span>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Ou informe outro valor</h3>
+                        <input type="number" 
+                               id="customAmount" 
+                               step="0.01" 
+                               min="0.01" 
+                               max="50000.00"
+                               placeholder="0,00" 
+                               class="w-full pl-16 pr-4 py-4 text-2xl border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                               oninput="validateCustomAmount(this)"
+                               value="0.01">
+                        <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            BRL
+                        </div>
                     </div>
                     
-                    <div class="flex flex-col lg:flex-row gap-6">
-                        <div class="flex-1">
-                            <div class="relative">
-                                <div class="absolute left-5 top-1/2 transform -translate-y-1/2">
-                                    <span class="text-2xl font-bold text-gray-400">R$</span>
-                                </div>
-                                <input type="number" 
-                                       id="customAmount" 
-                                       step="0.01" 
-                                       min="0.01" 
-                                       max="50000.00"
-                                       placeholder="0,00" 
-                                       class="w-full pl-16 pr-5 py-5 text-xl border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 bg-white"
-                                       oninput="validateCustomAmount(this)"
-                                       value="0.01">
-                                <div class="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    BRL
-                                </div>
-                            </div>
-                            <div class="flex items-center mt-3 text-sm text-gray-500">
-                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                                <span>Valores entre R$ 0,01 e R$ 50.000,00</span>
-                            </div>
-                        </div>
-                        <button onclick="createPixPayment()" 
-                                id="generatePixBtn"
-                                class="lg:w-auto px-10 py-5 success-gradient hover:opacity-95 text-white font-bold text-lg rounded-2xl transition-all duration-300 btn-hover flex items-center justify-center min-w-[200px]">
-                            <i class="fas fa-qrcode mr-3 text-lg"></i>
-                            Gerar PIX
-                        </button>
+                    <div class="flex items-center text-gray-500 text-sm mb-8">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        <span>Valores entre R$ 0,01 e R$ 50.000,00</span>
                     </div>
-                </div>
-
-                <!-- Loading State -->
-                <div id="loadingState" class="hidden text-center py-10">
-                    <div class="loading-spinner mx-auto mb-4"></div>
-                    <p class="text-gray-600 font-medium">Gerando pagamento PIX...</p>
-                    <p class="text-gray-500 text-sm mt-2">Conectando ao Mercado Pago</p>
-                </div>
-
-                <!-- Resultado -->
-                <div id="resultSection" class="hidden slide-in">
-                    <div class="border-t pt-10 mt-10">
-                        <div class="flex items-center mb-8">
-                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mr-4">
-                                <i class="fas fa-check text-emerald-600 text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-gray-900">PIX Gerado com Sucesso!</h3>
-                                <p class="text-gray-600">Pronto para pagamento</p>
-                            </div>
-                        </div>
-                        
-                        <div class="grid lg:grid-cols-2 gap-8">
-                            <!-- Informações -->
-                            <div class="space-y-5">
-                                <div class="bg-gradient-to-r from-gray-50 to-white p-5 rounded-2xl border border-gray-100">
-                                    <div class="text-sm text-gray-500 font-medium mb-2">IDENTIFICAÇÃO</div>
-                                    <div id="paymentId" class="font-mono text-gray-900 font-bold text-lg">-</div>
-                                </div>
-                                
-                                <div class="bg-gradient-to-r from-gray-50 to-white p-5 rounded-2xl border border-gray-100">
-                                    <div class="text-sm text-gray-500 font-medium mb-2">VALOR</div>
-                                    <div id="paymentAmount" class="text-4xl font-bold text-emerald-600">-</div>
-                                </div>
-                                
-                                <div class="bg-gradient-to-r from-gray-50 to-white p-5 rounded-2xl border border-gray-100">
-                                    <div class="text-sm text-gray-500 font-medium mb-2">STATUS</div>
-                                    <div class="flex items-center">
-                                        <span id="paymentStatus" class="px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-bold mr-3">-</span>
-                                        <div id="statusDot" class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                    </div>
-                                </div>
-                                
-                                <div id="qrCodeTextContainer" class="hidden">
-                                    <div class="text-sm text-gray-500 font-medium mb-2">CÓDIGO PIX</div>
-                                    <div id="qrCodeText" class="font-mono text-sm text-gray-800 bg-gray-50 p-4 rounded-xl break-all"></div>
-                                </div>
-                                
-                                <button onclick="copyToClipboard()" 
-                                        id="copyButton"
-                                        class="w-full py-4 border-2 border-blue-500 text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 flex items-center justify-center btn-hover">
-                                    <i class="far fa-copy mr-3"></i>
-                                    Copiar Código PIX
-                                </button>
-                            </div>
-                            
-                            <!-- QR Code -->
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="relative p-2 bg-gradient-to-br from-blue-50 to-emerald-50 rounded-3xl mb-6">
-                                    <div class="w-64 h-64 bg-white rounded-2xl flex items-center justify-center shadow-inner border-4 border-white">
-                                        <img id="qrCodeImage" src="" alt="QR Code PIX" class="w-full h-full p-4 hidden">
-                                        <div id="qrPlaceholder" class="text-center p-6">
-                                            <div class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                                <i class="fas fa-qrcode text-gray-400 text-3xl"></i>
-                                            </div>
-                                            <p class="text-gray-700 font-medium">QR Code PIX</p>
-                                            <p class="text-gray-400 text-sm mt-2">Será gerado automaticamente</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600 text-center">
-                                    <i class="fas fa-mobile-alt mr-2"></i>
-                                    Escaneie com seu app bancário
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-10 flex flex-col sm:flex-row gap-4">
-                            <button onclick="checkPaymentStatus()" 
-                                    id="checkStatusBtn"
-                                    class="flex-1 py-5 primary-gradient hover:opacity-95 text-white font-bold rounded-2xl transition-all duration-300 btn-hover flex items-center justify-center">
-                                <i class="fas fa-sync-alt mr-3"></i>
-                                Verificar Status
-                            </button>
-                            <button onclick="goToCheckout()" 
-                                    id="goToCheckoutBtn"
-                                    class="flex-1 py-5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:opacity-95 text-white font-bold rounded-2xl transition-all duration-300 btn-hover flex items-center justify-center">
-                                <i class="fas fa-external-link-alt mr-3"></i>
-                                Ir para Pagamento
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Error State -->
-                <div id="errorSection" class="hidden p-6 bg-red-50 border border-red-200 rounded-2xl mt-6">
-                    <div class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-xl mt-1 mr-4"></i>
-                        <div>
-                            <h4 class="text-red-800 font-bold mb-2" id="errorTitle">Erro ao gerar PIX</h4>
-                            <p class="text-red-600" id="errorMessage"></p>
-                            <button onclick="hideError()" class="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
-                                Tentar novamente
-                            </button>
-                        </div>
-                    </div>
+                    
+                    <button onclick="generatePayment()" 
+                            id="generateBtn"
+                            class="w-full py-5 success-gradient hover:opacity-95 text-white font-bold text-lg rounded-2xl transition-all duration-300 btn-hover flex items-center justify-center">
+                        <i class="fas fa-qrcode mr-3"></i>
+                        Gerar QR Code PIX
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="mt-12 pt-8 border-t border-gray-200 text-center text-gray-500 slide-in" style="animation-delay: 0.4s">
-            <div class="flex flex-col md:flex-row items-center justify-between mb-6">
-                <div class="flex items-center mb-4 md:mb-0">
-                    <div class="w-8 h-8 primary-gradient rounded-lg flex items-center justify-center mr-3">
-                        <i class="fas fa-bolt text-white text-sm"></i>
-                    </div>
-                    <span class="font-bold text-gray-700">PIX Instantâneo • Mercado Pago</span>
-                </div>
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Gerando pagamento...</h3>
+                <p class="text-gray-600">Conectando ao Mercado Pago</p>
             </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-10 text-center text-gray-500 text-sm slide-in" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-center mb-3">
+                <i class="fas fa-lock text-emerald-500 mr-2"></i>
+                <span>Pagamento 100% seguro</span>
+            </div>
+            <p>Sistema integrado com Mercado Pago</p>
         </footer>
     </div>
 
     <script>
-        // Usar caminhos relativos para a API
         const API_BASE = '/api';
-        
         let selectedAmount = 0.01;
-        let currentPaymentData = null;
         
         function selectAmount(amount) {
             selectedAmount = amount;
             
             // Remover seleção anterior
             document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.classList.remove('border-blue-500', 'border-emerald-500', 'border-purple-500');
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 
+                                    'border-emerald-500', 'bg-emerald-50',
+                                    'border-purple-500', 'bg-purple-50');
             });
             
             // Adicionar seleção atual
-            event.target.classList.add(amount === 0.01 ? 'border-blue-500' : 
-                                      amount === 1.00 ? 'border-emerald-500' : 'border-purple-500');
+            const btn = event.target.closest('.amount-btn');
+            if (amount === 0.01) {
+                btn.classList.add('border-blue-500', 'bg-blue-50');
+            } else if (amount === 1.00) {
+                btn.classList.add('border-emerald-500', 'bg-emerald-50');
+            } else {
+                btn.classList.add('border-purple-500', 'bg-purple-50');
+            }
             
             // Atualizar input
             document.getElementById('customAmount').value = amount.toFixed(2);
@@ -338,17 +223,16 @@
             selectedAmount = parseFloat(input.value) || 0.01;
         }
         
-        async function createPixPayment() {
+        async function generatePayment() {
             const amount = parseFloat(document.getElementById('customAmount').value) || selectedAmount;
             
             if (amount < 0.01 || amount > 50000) {
-                showError("Valor inválido", "Informe um valor entre R$ 0,01 e R$ 50.000,00");
+                showNotification("Informe um valor entre R$ 0,01 e R$ 50.000,00", "error");
                 return;
             }
             
             // Mostrar loading
             showLoading(true);
-            hideError();
             
             try {
                 const response = await fetch(`${API_BASE}/payments/create`, {
@@ -375,176 +259,34 @@
                     throw new Error(result.error || 'Erro ao criar pagamento');
                 }
                 
-                // Salvar dados do pagamento
-                currentPaymentData = result.data;
+                // Armazenar dados na sessionStorage
+                sessionStorage.setItem('pixPaymentData', JSON.stringify(result.data));
                 
-                // Atualizar UI com os dados
-                updatePaymentUI(currentPaymentData);
-                
-                // Esconder loading e mostrar resultado
-                showLoading(false);
-                showResult();
-                
-                showNotification("PIX gerado com sucesso!", "success");
+                // Redirecionar para checkout
+                setTimeout(() => {
+                    window.location.href = "/checkout";
+                }, 500);
                 
             } catch (error) {
                 console.error('Erro ao criar PIX:', error);
                 showLoading(false);
-                showError("Erro ao gerar PIX", error.message || "Tente novamente mais tarde");
+                showNotification(error.message || "Erro ao gerar pagamento", "error");
             }
-        }
-        
-        function updatePaymentUI(data) {
-            // Atualizar informações básicas
-            document.getElementById('paymentId').textContent = data.paymentId || data.id || '-';
-            document.getElementById('paymentAmount').textContent = `R$ ${data.amount ? data.amount.toFixed(2) : '0.00'}`;
-            document.getElementById('paymentStatus').textContent = data.status === 'pending' ? 'PENDENTE' : 'APROVADO';
-            
-            // Atualizar cor do status
-            const statusElement = document.getElementById('paymentStatus');
-            const statusDot = document.getElementById('statusDot');
-            
-            if (data.status === 'approved' || data.status === 'completed') {
-                statusElement.textContent = 'APROVADO';
-                statusElement.className = 'px-4 py-2 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold mr-3';
-                statusDot.className = 'w-3 h-3 bg-emerald-500 rounded-full animate-pulse';
-            } else if (data.status === 'pending') {
-                statusElement.textContent = 'PENDENTE';
-                statusElement.className = 'px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-bold mr-3';
-                statusDot.className = 'w-3 h-3 bg-amber-500 rounded-full animate-pulse';
-            } else {
-                statusElement.textContent = 'ERRO';
-                statusElement.className = 'px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-bold mr-3';
-                statusDot.className = 'w-3 h-3 bg-red-500 rounded-full';
-            }
-            
-            // Atualizar QR Code
-            if (data.qr_code_base64) {
-                const qrImage = document.getElementById('qrCodeImage');
-                qrImage.src = `data:image/png;base64,${data.qr_code_base64}`;
-                qrImage.classList.remove('hidden');
-                document.getElementById('qrPlaceholder').classList.add('hidden');
-            }
-            
-            // Atualizar texto do QR Code
-            if (data.qr_code_text) {
-                document.getElementById('qrCodeText').textContent = data.qr_code_text;
-                document.getElementById('qrCodeTextContainer').classList.remove('hidden');
-                document.getElementById('copyButton').setAttribute('data-text', data.qr_code_text);
-            }
-        }
-        
-        async function checkPaymentStatus() {
-            if (!currentPaymentData?.paymentId) {
-                showNotification("Nenhum pagamento gerado", "warning");
-                return;
-            }
-            
-            showNotification("Verificando status...", "info");
-            
-            try {
-                const response = await fetch(`${API_BASE}/payments/${currentPaymentData.paymentId}/status`);
-                
-                if (!response.ok) {
-                    throw new Error(`Erro ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                if (!result.success) {
-                    throw new Error(result.error);
-                }
-                
-                // Atualizar status na UI
-                currentPaymentData.status = result.data.status;
-                updatePaymentUI(currentPaymentData);
-                
-                showNotification("Status atualizado!", "success");
-                
-            } catch (error) {
-                console.error('Erro ao verificar status:', error);
-                showNotification("Erro ao verificar status", "error");
-            }
-        }
-        
-        function copyToClipboard() {
-            const textToCopy = document.getElementById('copyButton').getAttribute('data-text') || 
-                             document.getElementById('qrCodeText')?.textContent;
-            
-            if (!textToCopy) {
-                showNotification("Nenhum código para copiar", "warning");
-                return;
-            }
-            
-            navigator.clipboard.writeText(textToCopy)
-                .then(() => {
-                    const copyBtn = document.getElementById('copyButton');
-                    const originalText = copyBtn.innerHTML;
-                    
-                    copyBtn.innerHTML = '<i class="fas fa-check mr-3"></i>Copiado!';
-                    copyBtn.classList.remove('border-blue-500', 'text-blue-600');
-                    copyBtn.classList.add('border-emerald-500', 'text-emerald-600', 'bg-emerald-50');
-                    
-                    showNotification("Código PIX copiado!", "success");
-                    
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalText;
-                        copyBtn.classList.remove('border-emerald-500', 'text-emerald-600', 'bg-emerald-50');
-                        copyBtn.classList.add('border-blue-500', 'text-blue-600');
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Erro ao copiar:', err);
-                    showNotification("Erro ao copiar código", "error");
-                });
-        }
-        
-        function goToCheckout() {
-            if (!currentPaymentData) {
-                showNotification("Gere um PIX primeiro", "warning");
-                return;
-            }
-            
-            // Armazenar dados na sessionStorage para a página de checkout
-            sessionStorage.setItem('pixPaymentData', JSON.stringify(currentPaymentData));
-            
-            // Redirecionar para checkout
-            window.location.href = "/checkout";
         }
         
         function showLoading(show) {
-            const loadingEl = document.getElementById('loadingState');
-            const generateBtn = document.getElementById('generatePixBtn');
+            const overlay = document.getElementById('loadingOverlay');
+            const btn = document.getElementById('generateBtn');
             
             if (show) {
-                loadingEl.classList.remove('hidden');
-                generateBtn.disabled = true;
-                generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                overlay.classList.remove('hidden');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
             } else {
-                loadingEl.classList.add('hidden');
-                generateBtn.disabled = false;
-                generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                overlay.classList.add('hidden');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-        }
-        
-        function showResult() {
-            document.getElementById('resultSection').classList.remove('hidden');
-            
-            // Scroll suave para o resultado
-            document.getElementById('resultSection').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-        
-        function showError(title, message) {
-            document.getElementById('errorTitle').textContent = title;
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorSection').classList.remove('hidden');
-        }
-        
-        function hideError() {
-            document.getElementById('errorSection').classList.add('hidden');
         }
         
         function showNotification(message, type = "info") {
@@ -556,8 +298,7 @@
             };
             
             const toast = document.createElement('div');
-            toast.className = `fixed top-6 right-6 ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-xl z-50 max-w-md transform transition-all duration-300 slide-in`;
-            toast.style.animationDelay = '0s';
+            toast.className = `fixed top-6 right-6 ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-xl z-50 max-w-md`;
             toast.innerHTML = `
                 <div class="flex items-center">
                     <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} text-xl mr-4"></i>
@@ -572,7 +313,6 @@
             
             setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100px)';
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
@@ -587,160 +327,6 @@
                 el.style.animationDelay = `${index * 0.1}s`;
             });
         });
-
-    // variável global
-    let statusCheckInterval = null;
-
-    function startAutoStatusCheck(paymentId) {
-        if (statusCheckInterval) {
-            clearInterval(statusCheckInterval);
-        }
-        
-        statusCheckInterval = setInterval(async () => {
-            await checkPaymentStatus();
-        }, 10000); // Verificar a cada 10 segundos
-        
-        console.log(`🔍 Iniciando verificação automática para: ${paymentId}`);
-    }
-
-    // Modifique a função checkPaymentStatus para retornar dados
-    async function checkPaymentStatus() {
-        if (!currentPaymentData?.paymentId) {
-            showNotification("Nenhum pagamento gerado", "warning");
-            return null;
-        }
-        
-        try {
-            const response = await fetch(`${API_BASE}/payments/${currentPaymentData.paymentId}/status`);
-            
-            if (!response.ok) {
-                throw new Error(`Erro ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.error);
-            }
-            
-            // Atualizar dados do pagamento
-            currentPaymentData = { ...currentPaymentData, ...result.data };
-            
-            // Atualizar UI
-            updatePaymentUI(currentPaymentData);
-            
-            // Verificar se foi aprovado
-            if (result.data.approved || result.data.paid) {
-                showNotification("✅ Pagamento aprovado com sucesso!", "success");
-                
-                // Parar verificação automática
-                if (statusCheckInterval) {
-                    clearInterval(statusCheckInterval);
-                    statusCheckInterval = null;
-                }
-                
-                // Atualizar botões
-                document.getElementById('checkStatusBtn').innerHTML = '<i class="fas fa-check mr-3"></i>Pagamento Confirmado';
-                document.getElementById('checkStatusBtn').classList.remove('primary-gradient');
-                document.getElementById('checkStatusBtn').classList.add('success-gradient', 'cursor-not-allowed');
-                document.getElementById('checkStatusBtn').disabled = true;
-                
-                document.getElementById('goToCheckoutBtn').innerHTML = '<i class="fas fa-external-link-alt mr-3"></i>Ver Detalhes';
-            } else if (result.data.expired) {
-                showNotification("❌ Pagamento expirado. Gere um novo PIX.", "error");
-                if (statusCheckInterval) {
-                    clearInterval(statusCheckInterval);
-                    statusCheckInterval = null;
-                }
-            } else {
-                showNotification("Aguardando confirmação do pagamento...", "info");
-            }
-            
-            return result.data;
-            
-        } catch (error) {
-            console.error('Erro ao verificar status:', error);
-            showNotification("Erro ao verificar status", "error");
-            return null;
-        }
-    }
-
-    // Substitua a parte que mostra "Pagamento Confirmado" por:
-    if (result.data.approved || result.data.paid) {
-        showNotification("✅ Pagamento aprovado! Redirecionando...", "success");
-        
-        // Parar verificações
-        if (statusCheckInterval) {
-            clearInterval(statusCheckInterval);
-            statusCheckInterval = null;
-        }
-        
-        // Redirecionar para página de sucesso após 2 segundos
-        setTimeout(() => {
-            window.location.href = '/success';
-        }, 2000);
-    }
-
-    // Modifique a função createPixPayment para iniciar o polling
-    async function createPixPayment() {
-        const amount = parseFloat(document.getElementById('customAmount').value) || selectedAmount;
-        
-        if (amount < 0.01 || amount > 50000) {
-            showError("Valor inválido", "Informe um valor entre R$ 0,01 e R$ 50.000,00");
-            return;
-        }
-        
-        // Mostrar loading
-        showLoading(true);
-        hideError();
-        
-        try {
-            const response = await fetch(`${API_BASE}/payments/create`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    amount: amount,
-                    description: `Pagamento PIX de R$ ${amount.toFixed(2)}`,
-                    customerEmail: 'cliente@pix.com',
-                    customerName: 'Cliente PIX'
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Erro ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.error || 'Erro ao criar pagamento');
-            }
-            
-            // Salvar dados do pagamento
-            currentPaymentData = result.data;
-            
-            // Atualizar UI com os dados
-            updatePaymentUI(currentPaymentData);
-            
-            // Esconder loading e mostrar resultado
-            showLoading(false);
-            showResult();
-            
-            // Iniciar verificação automática
-            startAutoStatusCheck(currentPaymentData.paymentId);
-            
-            showNotification("PIX gerado com sucesso! Aguardando pagamento...", "success");
-            
-        } catch (error) {
-            console.error('Erro ao criar PIX:', error);
-            showLoading(false);
-            showError("Erro ao gerar PIX", error.message || "Tente novamente mais tarde");
-        }
-    }
-
     </script>
 </body>
 </html>
