@@ -1,19 +1,15 @@
 {
   "name": "fazmeupix",
   "version": "1.0.0",
-  "description": "Sistema de pagamento PIX",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
-    "dev": "node api/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "vercel-build": "echo 'Building...'"
   },
   "dependencies": {
     "express": "^4.18.2"
   },
   "engines": {
-    "node": "22.x"
-  },
-  "keywords": ["pix", "payment", "qr-code"],
-  "license": "MIT"
+    "node": "20.x"
+  }
 }
