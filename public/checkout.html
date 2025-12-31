@@ -980,52 +980,119 @@
         }
         
         // Gerar QR Code
-        function generateQRCode(qrCodeText) {
+        function generateValidQRCode(pixPayload) {
             const container = document.getElementById('qrcode-container');
             
-            if (!qrCodeText) {
-                container.innerHTML = `
-                    <div style="text-align: center; color: #666;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px; color: #ff6b6b;"></i>
-                        <p>QR Code não disponível</p>
-                        <button class="btn btn-primary" onclick="copyPixCode()" style="margin-top: 15px;">
-                            <i class="fas fa-copy"></i> Copiar Código PIX
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Usar API do QuickChart (confiável)
-            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrCodeText)}&size=250&margin=2&dark=00bfa5&light=ffffff&format=png`;
+            // Usar API do QuickChart (mais confiável)
+            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(pixPayload)}&size=300&margin=1&dark=000000&light=ffffff&format=png`;
             
             const img = new Image();
-            img.crossOrigin = "anonymous";
             img.alt = 'QR Code PIX';
-            img.style.width = '250px';
-            img.style.height = '250px';
+            img.style.width = '280px';
+            img.style.height = '280px';
+            img.style.border = '10px solid white';
+            img.style.borderRadius = '10px';
+            img.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
             
             img.onload = function() {
                 container.innerHTML = '';
                 container.appendChild(img);
-                console.log('✅ QR Code gerado com sucesso!');
+                
+                // Adicionar instruções
+                const instructions = document.createElement('div');
+                instructions.innerHTML = `
+                    <div style="margin-top: 15px; color: #666; font-size: 14px;">
+                        <p><strong>Como pagar:</strong></p>
+                        <ol style="text-align: left; margin: 10px 0 10px 20px;">
+                            <li>Abra seu app bancário</li>
+                            <li>Toque em "Pagar com PIX"</li>
+                            <li>Aponte a câmera para o código</li>
+                            <li>Confirme o pagamento</li>
+                        </ol>
+                    </div>
+                `;
+                container.appendChild(instructions);
+                
+                console.log('✅ QR Code PIX gerado com sucesso!');
             };
             
             img.onerror = function() {
-                container.innerHTML = `
-                    <div style="text-align: center; color: #666;">
-                        <div style="width: 200px; height: 200px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                            <i class="fas fa-qrcode" style="font-size: 48px; color: #999;"></i>
-                        </div>
-                        <p>QR Code não pôde ser carregado</p>
-                        <button class="btn btn-primary" onclick="copyPixCode()" style="margin-top: 15px;">
-                            <i class="fas fa-copy"></i> Copiar Código PIX
-                        </button>
-                    </div>
-                `;
+                // Fallback para outra API
+                const fallbackUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixPayload)}`;
+                img.src = fallbackUrl;
             };
             
             img.src = qrCodeUrl;
+        }
+
+        // Atualize a função createPayment:
+        async function createPayment() {
+            try {
+                console.log('📤 Criando pagamento PIX válido...');
+                
+                const response = await fetch('/api/payments/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: pixAmount,
+                        description: `Pagamento PIX de R$ ${pixAmount.toFixed(2)}`
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Erro ao criar pagamento');
+                }
+                
+                currentPayment = data.data;
+                console.log('✅ Pagamento PIX criado:', currentPayment.paymentId);
+                
+                // Usar pix_payload em vez de qr_code
+                const pixPayload = currentPayment.pix_payload || currentPayment.qr_code;
+                
+                if (pixPayload) {
+                    // Mostrar payload para debug
+                    console.log('📋 Payload PIX:', pixPayload.substring(0, 100) + '...');
+                    
+                    // Gerar QR Code válido
+                    generateValidQRCode(pixPayload);
+                    
+                    // Armazenar código PIX para copiar
+                    window.pixCodeForCopy = pixPayload;
+                } else {
+                    showError('Payload PIX não disponível');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao criar pagamento:', error);
+                throw error;
+            }
+        }
+
+        // Atualize a função copyPixCode:
+        function copyPixCode() {
+            const pixCode = window.pixCodeForCopy || currentPayment?.pix_payload || currentPayment?.qr_code;
+            
+            if (!pixCode) {
+                alert('Código PIX não disponível');
+                return;
+            }
+            
+            navigator.clipboard.writeText(pixCode)
+                .then(() => {
+                    alert('✅ Código PIX copiado! Agora cole no seu app bancário.');
+                })
+                .catch(err => {
+                    // Fallback
+                    const textarea = document.createElement('textarea');
+                    textarea.value = pixCode;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('✅ Código PIX copiado!');
+                });
         }
         
         // Contagem regressiva
