@@ -2,183 +2,177 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gerar Pagamento PIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         * {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
         
-        .card-shadow {
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 10px 20px rgba(0, 0, 0, 0.05);
+        /* Prevenir zoom no input */
+        input[type="number"] {
+            font-size: 16px !important;
         }
         
-        .primary-gradient {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        /* Scroll suave para mobile */
+        html {
+            scroll-behavior: smooth;
         }
         
-        .success-gradient {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        
-        .btn-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .btn-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .slide-in {
-            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #2563eb;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Melhorar toques em mobile */
+        button, a {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4 md:p-6">
-    <div class="container max-w-4xl mx-auto">
-        <!-- Header -->
-        <header class="text-center mb-10 slide-in">
-            <div class="flex flex-col items-center mb-6">
-                <div class="w-16 h-16 primary-gradient rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                    <i class="fas fa-bolt text-white text-2xl"></i>
+<body class="p-4 md:p-6">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header Mobile Friendly -->
+        <header class="text-center mb-6 mt-4">
+            <div class="flex flex-col items-center">
+                <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 shadow-lg">
+                    <i class="fas fa-bolt text-white text-xl"></i>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-3">Pagamento PIX</h1>
-                <p class="text-xl text-gray-600">Pagamentos instantâneos e seguros</p>
+                <h1 class="text-2xl font-bold text-white mb-1">PIX Instantâneo</h1>
+                <p class="text-white/90 text-sm">Pagamentos rápidos e seguros</p>
             </div>
         </header>
 
-        <!-- Main Card -->
-        <div class="bg-white rounded-3xl card-shadow overflow-hidden slide-in" style="animation-delay: 0.1s">
-            <!-- Card Header -->
-            <div class="primary-gradient px-8 py-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white">Informe o valor do pagamento</h2>
-                        <p class="text-blue-100 text-sm mt-1">Gere um QR Code PIX em segundos</p>
+        <!-- Main Card - Otimizado para mobile -->
+        <main class="flex-1">
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <!-- Card Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold text-white">Informe o valor</h2>
+                            <p class="text-blue-100 text-xs">Gere um QR Code PIX</p>
+                        </div>
+                        <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-sm"></i>
+                        </div>
                     </div>
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-coins text-white"></i>
+                </div>
+
+                <!-- Card Body - Mobile Optimized -->
+                <div class="p-5">
+                    <!-- Valores Sugeridos -->
+                    <div class="mb-6">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Valores sugeridos</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="selectAmount(0.01)" 
+                                    class="amount-btn group p-3 rounded-lg border border-gray-200 hover:border-blue-500 active:scale-95 transition-all duration-200">
+                                <div class="flex flex-col items-center">
+                                    <div class="text-base font-bold text-gray-800 group-hover:text-blue-600">R$ 0,01</div>
+                                    <div class="text-gray-500 text-[10px] mt-1">Mínimo</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="selectAmount(1.00)" 
+                                    class="amount-btn group p-3 rounded-lg border border-gray-200 hover:border-green-500 active:scale-95 transition-all duration-200">
+                                <div class="flex flex-col items-center">
+                                    <div class="text-base font-bold text-gray-800 group-hover:text-green-600">R$ 1,00</div>
+                                    <div class="text-gray-500 text-[10px] mt-1">Popular</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="selectAmount(10.00)" 
+                                    class="amount-btn group p-3 rounded-lg border border-gray-200 hover:border-purple-500 active:scale-95 transition-all duration-200">
+                                <div class="flex flex-col items-center">
+                                    <div class="text-base font-bold text-gray-800 group-hover:text-purple-600">R$ 10,00</div>
+                                    <div class="text-gray-500 text-[10px] mt-1">Recomendado</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input Valor - Mobile Friendly -->
+                    <div class="mb-8">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Ou digite outro valor</h3>
+                        
+                        <div class="relative mb-4">
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                <span class="text-lg font-bold text-gray-500">R$</span>
+                            </div>
+                            <input type="number" 
+                                   id="customAmount" 
+                                   step="0.01" 
+                                   min="0.01" 
+                                   max="50000.00"
+                                   placeholder="0,00" 
+                                   class="w-full pl-12 pr-10 py-4 text-xl border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all bg-white touch-manipulation"
+                                   oninput="validateCustomAmount(this)"
+                                   value="0.01"
+                                   inputmode="decimal">
+                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                                BRL
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-gray-500 text-xs mb-6">
+                            <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                            <span>Valores a partir de R$ 0,01</span>
+                        </div>
+                        
+                        <!-- Botão Principal - Grande para mobile -->
+                        <button onclick="generatePayment()" 
+                                id="generateBtn"
+                                class="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 active:scale-[0.98] text-white font-bold text-base rounded-xl transition-all duration-200 shadow-lg shadow-green-500/30 flex items-center justify-center touch-manipulation">
+                            <i class="fas fa-qrcode mr-2"></i>
+                            Gerar QR Code PIX
+                        </button>
+                    </div>
+
+                    <!-- Dicas Mobile -->
+                    <div class="bg-blue-50 rounded-xl p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 text-xs mb-2 flex items-center">
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            Dica rápida:
+                        </h4>
+                        <p class="text-blue-700 text-xs">
+                            Após gerar o QR Code, use a câmera do seu app bancário para escanear e pagar.
+                        </p>
                     </div>
                 </div>
             </div>
+        </main>
 
-            <!-- Card Body -->
-            <div class="p-8">
-                <!-- Valor Options -->
-                <div class="mb-10">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Valores sugeridos</h3>
-                    <div class="grid grid-cols-3 gap-4">
-                        <button onclick="selectAmount(0.01)" 
-                                class="amount-btn group p-4 rounded-xl border-2 border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
-                            <div class="flex flex-col items-center">
-                                <div class="text-xl font-bold text-gray-900 group-hover:text-blue-600">R$ 0,01</div>
-                                <div class="text-gray-500 text-xs mt-1">Mínimo</div>
-                            </div>
-                        </button>
-                        
-                        <button onclick="selectAmount(1.00)" 
-                                class="amount-btn group p-4 rounded-xl border-2 border-gray-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300">
-                            <div class="flex flex-col items-center">
-                                <div class="text-xl font-bold text-gray-900 group-hover:text-emerald-600">R$ 1,00</div>
-                                <div class="text-gray-500 text-xs mt-1">Recomendado</div>
-                            </div>
-                        </button>
-                        
-                        <button onclick="selectAmount(10.00)" 
-                                class="amount-btn group p-4 rounded-xl border-2 border-gray-100 hover:border-purple-500 hover:bg-purple-50 transition-all duration-300">
-                            <div class="flex flex-col items-center">
-                                <div class="text-xl font-bold text-gray-900 group-hover:text-purple-600">R$ 10,00</div>
-                                <div class="text-gray-500 text-xs mt-1">Popular</div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Valor Customizado -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Ou digite outro valor</h3>
-                    
-                    <div class="relative mb-6">
-                        <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
-                            <span class="text-xl font-bold text-gray-400">R$</span>
-                        </div>
-                        <input type="number" 
-                               id="customAmount" 
-                               step="0.01" 
-                               min="0.01" 
-                               max="50000.00"
-                               placeholder="0,00" 
-                               class="w-full pl-16 pr-4 py-4 text-2xl border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
-                               oninput="validateCustomAmount(this)"
-                               value="0.01">
-                        <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                            BRL
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center text-gray-500 text-sm mb-8">
-                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                        <span>Valores entre R$ 0,01 e R$ 50.000,00</span>
-                    </div>
-                    
-                    <button onclick="generatePayment()" 
-                            id="generateBtn"
-                            class="w-full py-5 success-gradient hover:opacity-95 text-white font-bold text-lg rounded-2xl transition-all duration-300 btn-hover flex items-center justify-center">
-                        <i class="fas fa-qrcode mr-3"></i>
-                        Gerar QR Code PIX
-                    </button>
-                </div>
+        <!-- Loading Overlay - Mobile Optimized -->
+        <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">
+                <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Gerando pagamento...</h3>
+                <p class="text-gray-600 text-sm">Aguarde um momento</p>
             </div>
         </div>
 
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
-                <div class="loading-spinner mx-auto mb-4"></div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Gerando pagamento...</h3>
-                <p class="text-gray-600">Conectando ao Mercado Pago</p>
+        <!-- Footer Mobile -->
+        <footer class="mt-6 text-center">
+            <div class="flex items-center justify-center space-x-4 text-white/80 text-xs mb-2">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    <span>Seguro</span>
+                </div>
+                <div class="w-px h-4 bg-white/30"></div>
+                <div class="flex items-center">
+                    <i class="fas fa-bolt mr-1"></i>
+                    <span>Rápido</span>
+                </div>
             </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-10 text-center text-gray-500 text-sm slide-in" style="animation-delay: 0.3s">
-            <div class="flex items-center justify-center mb-3">
-                <i class="fas fa-lock text-emerald-500 mr-2"></i>
-                <span>Pagamento 100% seguro</span>
-            </div>
-            <p>Sistema integrado com Mercado Pago</p>
+            <p class="text-white/60 text-xs">Integrado com Mercado Pago</p>
         </footer>
     </div>
 
@@ -186,28 +180,41 @@
         const API_BASE = '/api';
         let selectedAmount = 0.01;
         
+        // Prevenir double tap zoom
+        let lastClick = 0;
+        function preventDoubleTap(event) {
+            const now = Date.now();
+            if (now - lastClick < 300) {
+                event.preventDefault();
+            }
+            lastClick = now;
+        }
+        
         function selectAmount(amount) {
             selectedAmount = amount;
             
             // Remover seleção anterior
             document.querySelectorAll('.amount-btn').forEach(btn => {
                 btn.classList.remove('border-blue-500', 'bg-blue-50', 
-                                    'border-emerald-500', 'bg-emerald-50',
+                                    'border-green-500', 'bg-green-50',
                                     'border-purple-500', 'bg-purple-50');
             });
             
             // Adicionar seleção atual
-            const btn = event.target.closest('.amount-btn');
+            const btn = event.currentTarget;
             if (amount === 0.01) {
                 btn.classList.add('border-blue-500', 'bg-blue-50');
             } else if (amount === 1.00) {
-                btn.classList.add('border-emerald-500', 'bg-emerald-50');
+                btn.classList.add('border-green-500', 'bg-green-50');
             } else {
                 btn.classList.add('border-purple-500', 'bg-purple-50');
             }
             
             // Atualizar input
             document.getElementById('customAmount').value = amount.toFixed(2);
+            
+            // Feedback tátil
+            btn.classList.add('active:scale-95');
         }
         
         function validateCustomAmount(input) {
@@ -234,6 +241,11 @@
             // Mostrar loading
             showLoading(true);
             
+            // Vibrar se suportado (feedback mobile)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
             try {
                 const response = await fetch(`${API_BASE}/payments/create`, {
                     method: 'POST',
@@ -259,13 +271,18 @@
                     throw new Error(result.error || 'Erro ao criar pagamento');
                 }
                 
-                // Armazenar dados na sessionStorage
+                // Armazenar dados
                 sessionStorage.setItem('pixPaymentData', JSON.stringify(result.data));
+                
+                // Feedback de sucesso
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 30, 50]);
+                }
                 
                 // Redirecionar para checkout
                 setTimeout(() => {
                     window.location.href = "/checkout";
-                }, 500);
+                }, 300);
                 
             } catch (error) {
                 console.error('Erro ao criar PIX:', error);
@@ -281,29 +298,43 @@
             if (show) {
                 overlay.classList.remove('hidden');
                 btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('opacity-50');
+                // Prevenir scroll no body quando loading estiver aberto
+                document.body.style.overflow = 'hidden';
             } else {
                 overlay.classList.add('hidden');
                 btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.remove('opacity-50');
+                document.body.style.overflow = 'auto';
             }
         }
         
         function showNotification(message, type = "info") {
+            // Remover notificação anterior
+            const existing = document.querySelector('.mobile-toast');
+            if (existing) existing.remove();
+            
             const colors = {
-                success: 'bg-emerald-500',
+                success: 'bg-green-500',
                 error: 'bg-red-500',
-                warning: 'bg-amber-500',
+                warning: 'bg-yellow-500',
                 info: 'bg-blue-500'
             };
             
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
             const toast = document.createElement('div');
-            toast.className = `fixed top-6 right-6 ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-xl z-50 max-w-md`;
+            toast.className = `mobile-toast fixed bottom-20 left-4 right-4 ${colors[type]} text-white px-4 py-3 rounded-xl shadow-2xl z-50 animate-slide-up`;
             toast.innerHTML = `
                 <div class="flex items-center">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} text-xl mr-4"></i>
-                    <div class="flex-1 font-medium">${message}</div>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white/80 hover:text-white">
+                    <i class="fas ${icons[type]} text-lg mr-3"></i>
+                    <div class="flex-1 text-sm font-medium">${message}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-white/80">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -311,22 +342,66 @@
             
             document.body.appendChild(toast);
             
+            // Auto-remover
             setTimeout(() => {
                 toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
                 setTimeout(() => toast.remove(), 300);
-            }, 4000);
+            }, 3000);
         }
+        
+        // CSS para animação do toast
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slide-up {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .animate-slide-up {
+                animation: slide-up 0.3s ease-out;
+            }
+            
+            /* Melhorar toque em botões */
+            @media (max-width: 640px) {
+                button {
+                    min-height: 44px;
+                }
+                
+                input, select, textarea {
+                    font-size: 16px !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
+            // Selecionar valor inicial
             selectAmount(0.01);
             
-            // Animar elementos
-            const elements = document.querySelectorAll('.slide-in');
-            elements.forEach((el, index) => {
-                el.style.animationDelay = `${index * 0.1}s`;
+            // Prevenir double tap zoom em botões
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('touchstart', preventDoubleTap);
             });
+            
+            // Focar no input se for desktop
+            if (window.innerWidth > 768) {
+                document.getElementById('customAmount').focus();
+            }
         });
+        
+        // Detectar toque vs mouse
+        let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) {
+            document.body.classList.add('touch-device');
+        }
     </script>
 </body>
 </html>
