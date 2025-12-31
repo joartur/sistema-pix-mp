@@ -1,4 +1,3 @@
-// src/services/mercadoPagoService.js
 const { MercadoPagoConfig, Payment } = require('mercadopago');
 
 class MercadoPagoService {
@@ -178,6 +177,39 @@ class MercadoPagoService {
         
         return 'pending';
     }
+    
+    async handleWebhook(paymentId) {
+        try {
+            console.log(`🔔 Webhook recebido para: ${paymentId}`);
+            
+            // Verificar status atual
+            const status = await this.checkPaymentStatus(paymentId);
+            
+            if (status === 'approved') {
+                console.log(`✅ Pagamento confirmado via webhook: ${paymentId}`);
+                return {
+                    success: true,
+                    paymentId,
+                    status: 'approved',
+                    message: 'Pagamento confirmado'
+                };
+            }
+            
+            return {
+                success: false,
+                paymentId,
+                status: 'pending',
+                message: 'Aguardando confirmação'
+            };
+            
+        } catch (error) {
+            console.error('❌ Erro no webhook:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }   
 }
 
 // Exportar instância única

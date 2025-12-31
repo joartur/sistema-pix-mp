@@ -306,6 +306,9 @@
             
             <!-- Ações -->
             <div class="actions">
+                <button class="btn btn-secondary" onclick="checkNow()">
+                    <i class="fas fa-sync-alt"></i> Verificar Agora
+                </button>               
                 <button class="btn btn-primary" onclick="copyPixCode()" id="copy-btn">
                     <i class="fas fa-copy"></i> Copiar Código PIX
                 </button>
@@ -1056,24 +1059,57 @@
         function startStatusVerification() {
             if (!currentPayment) return;
             
+            console.log('🔄 Iniciando verificação de status...');
+            
             statusInterval = setInterval(async () => {
                 try {
+                    console.log(`🔍 Verificando status: ${currentPayment.paymentId}`);
+                    
                     const response = await fetch(`/api/payments/${currentPayment.paymentId}/status`);
                     const data = await response.json();
                     
                     if (data.success) {
+                        console.log('📊 Status recebido:', data.data);
                         updatePaymentStatus(data.data);
                         
                         if (data.data.approved) {
+                            console.log('✅ Pagamento confirmado! Parando verificações...');
                             clearInterval(statusInterval);
                             clearInterval(countdownInterval);
                             showSuccess();
                         }
+                    } else {
+                        console.warn('⚠️ Erro na verificação:', data.error);
                     }
                 } catch (error) {
-                    console.error('Erro ao verificar status:', error);
+                    console.error('❌ Erro ao verificar status:', error);
                 }
-            }, 3000);
+            }, 3000); // Verificar a cada 3 segundos
+            
+            // Forçar verificação mais intensa nos primeiros segundos
+            setTimeout(() => {
+                if (statusInterval) {
+                    clearInterval(statusInterval);
+                    statusInterval = setInterval(async () => {
+                        try {
+                            const response = await fetch(`/api/payments/${currentPayment.paymentId}/status`);
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                updatePaymentStatus(data.data);
+                                
+                                if (data.data.approved) {
+                                    clearInterval(statusInterval);
+                                    clearInterval(countdownInterval);
+                                    showSuccess();
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Erro na verificação:', error);
+                        }
+                    }, 5000); // Depois de 30 segundos, verificar a cada 5 segundos
+                }
+            }, 30000);
         }
         
         // Atualizar status
@@ -1311,6 +1347,55 @@
                 animation.onfinish = () => confetti.remove();
             }
         }
+
+        async function checkNow() {
+            if (!currentPayment) {
+                alert('Nenhum pagamento em andamento');
+                return;
+            }
+            
+            const statusElement = document.getElementById('payment-status');
+            const originalContent = statusElement.innerHTML;
+            
+            // Mostrar carregamento
+            statusElement.innerHTML = `
+                <div class="status-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="status-content">
+                    <strong>Verificando agora...</strong>
+                    <p>Por favor, aguarde</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`/api/payments/${currentPayment.paymentId}/status`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updatePaymentStatus(data.data);
+                    
+                    if (data.data.approved) {
+                        clearInterval(statusInterval);
+                        clearInterval(countdownInterval);
+                        showSuccess();
+                    } else {
+                        // Restaurar conteúdo após 2 segundos
+                        setTimeout(() => {
+                            updatePaymentStatus(data.data);
+                        }, 2000);
+                    }
+                } else {
+                    showError(data.error || 'Erro ao verificar');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showError('Erro na conexão');
+                setTimeout(() => {
+                    statusElement.innerHTML = originalContent;
+                }, 2000);
+            }
+        }        
 
         // Som de sucesso (opcional)
         function playSuccessSound() {
