@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Pagamentos PIX • Processamento</title>
+    <title>Pagamento PIX • Processamento</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblioteca QRCode.js -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
         * { font-family: 'Inter', sans-serif; }
         body { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; }
         .card-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
         .gradient-primary { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
         .gradient-success { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
-        .gradient-warning { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
         
         .progress-animation {
             height: 6px;
@@ -30,31 +30,49 @@
             100% { background-position: 0 0; width: 0%; }
         }
         
-        .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
-        .qr-code-container:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); transform: translateY(-5px); }
+        .qr-display {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
         
-        .status-pending { background-color: #fef3c7; color: #92400e; border-color: #fbbf24; }
-        .status-processing { background-color: #dbeafe; color: #1e40af; border-color: #60a5fa; }
-        .status-completed { background-color: #d1fae5; color: #065f46; border-color: #10b981; }
+        .pix-code-display {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            line-height: 1.4;
+        }
+        
+        .status-pending { background-color: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+        .status-processing { background-color: #dbeafe; color: #1e40af; border: 1px solid #60a5fa; }
+        .status-completed { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
     </style>
 </head>
 <body class="p-4 md:p-6">
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <header class="mb-8">
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between bg-white rounded-2xl card-shadow p-6">
-                <div class="flex items-center mb-6 md:mb-0">
-                    <a href="index.html" class="flex items-center text-gray-700 hover:text-blue-600 transition-colors mr-8">
-                        <i class="fas fa-arrow-left mr-3 text-lg"></i>
-                        <span class="font-medium">Voltar</span>
-                    </a>
+            <div class="bg-white rounded-2xl card-shadow p-6">
+                <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center mr-4">
-                            <i class="fas fa-lock text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900">Pagamento PIX</h1>
-                            <p class="text-gray-600">Processamento seguro em tempo real</p>
+                        <a href="index.html" class="flex items-center text-gray-700 hover:text-blue-600 transition-colors mr-8">
+                            <i class="fas fa-arrow-left mr-3 text-lg"></i>
+                            <span class="font-medium">Voltar</span>
+                        </a>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center mr-4">
+                                <i class="fas fa-lock text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900">Pagamento PIX</h1>
+                                <p class="text-gray-600">Processamento seguro em tempo real</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -69,7 +87,11 @@
                     <!-- Valor -->
                     <div class="text-center mb-8">
                         <p class="text-gray-600 mb-3 font-medium">VALOR A PAGAR</p>
-                        <div id="paymentAmountDisplay" class="text-6xl font-bold text-green-600 mb-4">Carregando...</div>
+                        <div id="paymentAmountDisplay" class="text-6xl font-bold text-green-600 mb-4">R$ 0,01</div>
+                        <div class="inline-flex items-center px-5 py-2 bg-green-50 text-green-700 rounded-full border border-green-200">
+                            <i class="fas fa-bolt mr-2"></i>
+                            <span class="font-medium">Pagamento instantâneo</span>
+                        </div>
                     </div>
                     
                     <!-- Instruções -->
@@ -77,38 +99,42 @@
                         <h3 class="text-xl font-semibold text-gray-900 mb-5">Como realizar o pagamento</h3>
                         <div class="space-y-4">
                             <div class="flex items-start bg-blue-50 p-4 rounded-xl">
-                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border">
+                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border border-blue-200">
                                     <span class="text-blue-700 font-bold">1</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-blue-900">Abra seu app bancário</p>
+                                    <p class="font-medium text-blue-900 mb-1">Abra seu app bancário</p>
+                                    <p class="text-blue-700 text-sm">Acesse o aplicativo do seu banco</p>
                                 </div>
                             </div>
                             
                             <div class="flex items-start bg-blue-50 p-4 rounded-xl">
-                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border">
+                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border border-blue-200">
                                     <span class="text-blue-700 font-bold">2</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-blue-900">Selecione "Pagar com PIX"</p>
+                                    <p class="font-medium text-blue-900 mb-1">Toque em "Pagar com PIX"</p>
+                                    <p class="text-blue-700 text-sm">Selecione a opção PIX no menu</p>
                                 </div>
                             </div>
                             
                             <div class="flex items-start bg-blue-50 p-4 rounded-xl">
-                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border">
+                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border border-blue-200">
                                     <span class="text-blue-700 font-bold">3</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-blue-900">Escaneie o QR Code</p>
+                                    <p class="font-medium text-blue-900 mb-1">Aponte a câmera para o código</p>
+                                    <p class="text-blue-700 text-sm">Posicione o QR Code na área de leitura</p>
                                 </div>
                             </div>
                             
                             <div class="flex items-start bg-blue-50 p-4 rounded-xl">
-                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border">
+                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-4 border border-blue-200">
                                     <span class="text-blue-700 font-bold">4</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-blue-900">Confirme o pagamento</p>
+                                    <p class="font-medium text-blue-900 mb-1">Confirme o pagamento</p>
+                                    <p class="text-blue-700 text-sm">Revise os dados e confirme</p>
                                 </div>
                             </div>
                         </div>
@@ -123,34 +149,47 @@
                             </div>
                             <div class="flex items-center">
                                 <span id="countdown" class="text-3xl font-bold text-gray-900 mr-3">30:00</span>
-                                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                                <div class="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
                             </div>
                         </div>
                         <div class="progress-animation"></div>
+                        <div class="flex justify-between text-sm text-gray-600 mt-3">
+                            <span>Válido por 30 minutos</span>
+                            <span id="expiryTime"></span>
+                        </div>
                     </div>
                     
                     <!-- Status -->
                     <div class="mb-8">
-                        <div id="statusContainer" class="status-pending border rounded-xl p-4">
+                        <div id="statusContainer" class="status-pending rounded-xl p-4">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <div class="font-medium mb-1" id="statusText">Aguardando pagamento</div>
+                                    <div class="font-medium mb-1 flex items-center">
+                                        <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3 animate-pulse"></div>
+                                        <span id="statusText">Aguardando pagamento</span>
+                                    </div>
                                     <div class="text-sm" id="statusDescription">Escaneie o QR Code para pagar</div>
                                 </div>
+                                <button onclick="checkPaymentStatus()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-sync-alt mr-2"></i>
+                                    Atualizar
+                                </button>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Botões -->
-                    <button onclick="checkPaymentStatus()" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors mb-4">
-                        <i class="fas fa-sync-alt mr-2"></i>
-                        Verificar Status
-                    </button>
-                    
-                    <button onclick="createNewPayment()" class="w-full py-4 bg-white border-2 border-blue-500 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors">
-                        <i class="fas fa-plus-circle mr-2"></i>
-                        Novo Pagamento
-                    </button>
+                    <div class="space-y-4">
+                        <button onclick="markAsPaid()" class="w-full py-4 gradient-success text-white font-semibold rounded-xl hover:opacity-95 transition-colors flex items-center justify-center">
+                            <i class="fas fa-check-circle mr-3 text-lg"></i>
+                            Confirmar Pagamento
+                        </button>
+                        
+                        <button onclick="createNewPayment()" class="w-full py-4 bg-white border-2 border-blue-500 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors flex items-center justify-center">
+                            <i class="fas fa-plus-circle mr-3"></i>
+                            Novo Pagamento
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -159,48 +198,68 @@
                 <div class="bg-white rounded-2xl card-shadow p-6 h-full">
                     <!-- QR Code -->
                     <div class="text-center mb-8">
-                        <div class="qr-code-container p-4 mb-6">
-                            <div id="qrCodeDisplay" class="w-72 h-72 mx-auto flex items-center justify-center">
-                                <!-- QR Code será carregado aqui -->
+                        <div class="qr-display mb-6">
+                            <div class="text-center mb-4">
+                                <div class="text-gray-900 font-semibold mb-2">QR Code PIX</div>
+                                <p class="text-gray-600 text-sm">Código válido para pagamento</p>
+                            </div>
+                            <div id="qrCodeDisplay" class="flex justify-center mb-4"></div>
+                            <div class="flex items-center justify-center space-x-6 text-sm text-gray-500">
+                                <div class="flex items-center">
+                                    <i class="fas fa-mobile-alt mr-2"></i>
+                                    <span>Escaneie com seu celular</span>
+                                </div>
+                                <div class="w-1 h-1 bg-gray-300 rounded-full"></div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-bank mr-2"></i>
+                                    <span>Todos os bancos</span>
+                                </div>
                             </div>
                         </div>
-                        <p class="text-gray-600">Escaneie com a câmera do seu celular</p>
                     </div>
                     
                     <!-- Código PIX Copiável -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold text-gray-900">
-                                <i class="fas fa-key mr-2 text-blue-500"></i>
-                                Código PIX
+                            <h3 class="font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-key mr-3 text-blue-500"></i>
+                                Código PIX (Copia e Cola)
                             </h3>
-                            <button onclick="copyPixCode()" id="copyButton" class="px-4 py-2 gradient-primary text-white rounded-lg flex items-center">
+                            <button onclick="copyPixCode()" id="copyButton" class="px-4 py-2 gradient-primary text-white rounded-lg hover:opacity-95 transition-colors flex items-center">
                                 <i class="far fa-copy mr-2"></i>
-                                Copiar
+                                Copiar Código
                             </button>
                         </div>
                         
-                        <div class="bg-gray-50 p-4 rounded-xl border">
-                            <div id="pixCodeDisplay" class="font-mono text-sm text-gray-800 break-all"></div>
+                        <div class="pix-code-display" id="pixCodeDisplay">
+                            <!-- Código PIX será carregado aqui -->
                         </div>
                         
-                        <p class="text-gray-500 text-xs mt-3">
+                        <p class="text-gray-500 text-xs mt-3 flex items-center">
                             <i class="fas fa-info-circle mr-2"></i>
-                            Cole no campo PIX do seu banco
+                            Cole este código no campo PIX do seu aplicativo bancário
                         </p>
                     </div>
                     
                     <!-- Informações -->
-                    <div class="pt-6 border-t">
-                        <h4 class="font-semibold text-gray-900 mb-4">Informações da transação</h4>
+                    <div class="pt-6 border-t border-gray-200">
+                        <h4 class="font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-receipt mr-3 text-gray-400"></i>
+                            Informações da transação
+                        </h4>
+                        
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <span class="text-gray-600">ID:</span>
-                                <span id="transactionId" class="font-mono font-medium"></span>
+                                <span class="text-gray-600">ID da transação:</span>
+                                <span id="transactionId" class="font-mono font-medium text-gray-900"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Data:</span>
-                                <span id="transactionDate" class="font-medium"></span>
+                                <span class="text-gray-600">Data e hora:</span>
+                                <span id="transactionDate" class="font-medium text-gray-900"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Método:</span>
+                                <span class="font-medium text-gray-900">PIX Instantâneo</span>
                             </div>
                         </div>
                     </div>
@@ -212,25 +271,45 @@
     <script>
         let countdownInterval;
         let timeRemaining = 30 * 60;
+        let paymentData = null;
         
-        // Função para gerar QR Code
+        // Função para gerar QR Code usando QRCode.js
         function generateQRCode(text, elementId) {
             const qrContainer = document.getElementById(elementId);
             qrContainer.innerHTML = '';
             
-            // API do Google Charts para QR Code
-            const qrUrl = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(text)}&choe=UTF-8`;
+            const canvas = document.createElement('canvas');
+            qrContainer.appendChild(canvas);
             
-            const img = document.createElement('img');
-            img.src = qrUrl;
-            img.alt = 'QR Code PIX';
-            img.className = 'w-full h-auto';
-            qrContainer.appendChild(img);
+            QRCode.toCanvas(canvas, text, {
+                width: 220,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function(error) {
+                if (error) {
+                    console.error('Erro ao gerar QR Code:', error);
+                    qrContainer.innerHTML = `
+                        <div class="text-center p-8">
+                            <i class="fas fa-qrcode text-gray-300 text-6xl mb-4"></i>
+                            <p class="text-gray-600">QR Code gerado</p>
+                            <p class="text-gray-500 text-sm mt-2">Use o código PIX abaixo</p>
+                        </div>
+                    `;
+                }
+            });
         }
         
         // Timer
         function startCountdown() {
             const countdownElement = document.getElementById('countdown');
+            const expiryElement = document.getElementById('expiryTime');
+            
+            // Calcular horário de expiração
+            const expiryTime = new Date(Date.now() + 30 * 60000);
+            expiryElement.textContent = `Expira às ${expiryTime.getHours().toString().padStart(2, '0')}:${expiryTime.getMinutes().toString().padStart(2, '0')}`;
             
             countdownInterval = setInterval(() => {
                 const minutes = Math.floor(timeRemaining / 60);
@@ -238,14 +317,18 @@
                 
                 countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 
+                // Mudar cor conforme tempo passa
                 if (timeRemaining < 5 * 60) {
+                    countdownElement.classList.remove('text-gray-900');
                     countdownElement.classList.add('text-red-600');
+                    document.getElementById('statusText').textContent = 'Expirando em breve';
                 }
                 
                 if (timeRemaining <= 0) {
                     clearInterval(countdownInterval);
                     countdownElement.textContent = '00:00';
                     updateStatus('expired', 'QR Code expirado');
+                    showNotification('O QR Code expirou. Gere um novo pagamento.', 'error');
                 }
                 
                 timeRemaining--;
@@ -256,25 +339,35 @@
             const container = document.getElementById('statusContainer');
             const text = document.getElementById('statusText');
             
-            container.className = 'border rounded-xl p-4';
+            // Remover todas as classes de status
+            container.classList.remove('status-pending', 'status-processing', 'status-completed');
+            
             text.textContent = message;
             
             switch(status) {
                 case 'pending':
                     container.classList.add('status-pending');
+                    document.getElementById('statusDescription').textContent = 'Escaneie o QR Code para pagar';
                     break;
                 case 'processing':
                     container.classList.add('status-processing');
+                    document.getElementById('statusDescription').textContent = 'Pagamento identificado e em processamento';
                     break;
                 case 'completed':
                     container.classList.add('status-completed');
+                    document.getElementById('statusDescription').textContent = 'Pagamento confirmado e finalizado com sucesso';
+                    break;
+                case 'expired':
+                    container.classList.add('status-pending');
+                    document.getElementById('statusDescription').textContent = 'O QR Code expirou e não pode mais ser usado';
                     break;
             }
         }
         
         function checkPaymentStatus() {
-            showNotification('Verificando pagamento...', 'info');
+            showNotification('Consultando status do pagamento...', 'info');
             
+            // Simulação de verificação
             setTimeout(() => {
                 const random = Math.random();
                 if (random > 0.7) {
@@ -295,27 +388,52 @@
             const pixCode = document.getElementById('pixCodeDisplay').textContent;
             const copyBtn = document.getElementById('copyButton');
             
+            if (!pixCode || pixCode === '') {
+                showNotification('Nenhum código PIX disponível', 'error');
+                return;
+            }
+            
             navigator.clipboard.writeText(pixCode)
                 .then(() => {
+                    // Feedback visual
+                    const originalHTML = copyBtn.innerHTML;
                     copyBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Copiado!';
                     copyBtn.classList.add('bg-green-600');
-                    showNotification('Código copiado!', 'success');
+                    
+                    showNotification('Código PIX copiado com sucesso!', 'success');
                     
                     setTimeout(() => {
-                        copyBtn.innerHTML = '<i class="far fa-copy mr-2"></i>Copiar';
+                        copyBtn.innerHTML = originalHTML;
                         copyBtn.classList.remove('bg-green-600');
                     }, 2000);
                 })
                 .catch(() => {
-                    showNotification('Erro ao copiar', 'error');
+                    showNotification('Erro ao copiar código', 'error');
                 });
+        }
+        
+        function markAsPaid() {
+            showNotification('Verificando seu pagamento...', 'info');
+            
+            // Simulação de processamento
+            setTimeout(() => {
+                const confirmed = Math.random() > 0.3;
+                
+                if (confirmed) {
+                    updateStatus('completed', 'Pagamento confirmado');
+                    showNotification('Pagamento confirmado! Obrigado pela sua transação.', 'success');
+                    clearInterval(countdownInterval);
+                } else {
+                    showNotification('Pagamento ainda não identificado. Tente novamente em alguns instantes.', 'warning');
+                }
+            }, 2000);
         }
         
         function createNewPayment() {
             window.location.href = 'index.html';
         }
         
-        function showNotification(message, type) {
+        function showNotification(message, type = 'info') {
             const colors = {
                 success: 'bg-green-600',
                 error: 'bg-red-600',
@@ -323,17 +441,29 @@
                 info: 'bg-blue-600'
             };
             
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
             const toast = document.createElement('div');
-            toast.className = `fixed top-6 right-6 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md`;
+            toast.className = `fixed top-6 right-6 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md transform transition-all duration-300`;
             toast.innerHTML = `
                 <div class="flex items-center">
-                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle mr-3"></i>
+                    <i class="fas ${icons[type]} mr-3"></i>
                     <span>${message}</span>
                 </div>
             `;
             
             document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
         
         // Carregar dados do pagamento
@@ -341,33 +471,38 @@
             const savedPayment = localStorage.getItem('currentPayment');
             
             if (!savedPayment) {
-                showNotification('Nenhum pagamento encontrado. Voltando...', 'error');
+                showNotification('Nenhum pagamento encontrado. Redirecionando...', 'error');
                 setTimeout(() => window.location.href = 'index.html', 2000);
                 return;
             }
             
             try {
-                const payment = JSON.parse(savedPayment);
+                paymentData = JSON.parse(savedPayment);
                 
                 // Preencher informações
-                document.getElementById('paymentAmountDisplay').textContent = `R$ ${parseFloat(payment.amount).toFixed(2)}`;
-                document.getElementById('transactionId').textContent = payment.id;
-                document.getElementById('pixCodeDisplay').textContent = payment.pixCode;
+                document.getElementById('paymentAmountDisplay').textContent = `R$ ${parseFloat(paymentData.amount).toFixed(2)}`;
+                document.getElementById('transactionId').textContent = paymentData.id;
+                document.getElementById('pixCodeDisplay').textContent = paymentData.pixCode;
                 
                 // Formatar data
-                const date = new Date(payment.timestamp);
+                const date = new Date(paymentData.timestamp);
                 document.getElementById('transactionDate').textContent = 
-                    date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+                    date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
                 
                 // Gerar QR Code
-                generateQRCode(payment.pixCode, 'qrCodeDisplay');
+                generateQRCode(paymentData.pixCode, 'qrCodeDisplay');
                 
                 // Iniciar timer
                 startCountdown();
                 
+                showNotification('Pagamento carregado com sucesso!', 'success');
+                
             } catch (error) {
                 console.error('Erro ao carregar pagamento:', error);
-                showNotification('Erro ao carregar pagamento', 'error');
+                showNotification('Erro ao carregar pagamento. Voltando...', 'error');
                 setTimeout(() => window.location.href = 'index.html', 2000);
             }
         });
