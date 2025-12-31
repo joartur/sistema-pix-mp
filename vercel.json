@@ -13,15 +13,11 @@
     },
     {
       "src": "/checkout",
-      "dest": "/public/checkout.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/",
-      "dest": "/public/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
+      "dest": "/api/index.js"
     }
   ]
 }

@@ -1,113 +1,240 @@
 const express = require('express');
-const cors = require('cors');
-const path = require('path');
-
 const app = express();
 
-// Middlewares
-app.use(cors());
+// Middleware básico
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, '../public')));
+// Store em memória para pagamentos
+const payments = new Map();
 
-// Importar rotas
-const paymentRoutes = require('./payments');
-const webhookRoutes = require('./webhook');
-
-// Rotas da API
-app.use('/api', paymentRoutes);
-app.use('/api', webhookRoutes);
-
-// Rotas para páginas
-app.get('/checkout', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/checkout.html'));
+// CORS para todas as rotas
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-});
+// ============ ROTAS DA API ============
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'ok',
-        service: 'PIX Payment System',
+        service: 'PIX Payment API',
         timestamp: new Date().toISOString(),
-        endpoints: {
-            create_payment: 'POST /api/payments/create',
-            check_status: 'GET /api/payments/:id/status',
-            webhook: 'POST /api/payments/webhook',
-            webhook_test: 'POST /api/payments/webhook/test',
-            debug: 'GET /api/debug'
+        node: process.version
+    });
+});
+
+// Criar pagamento PIX
+app.post('/api/payments/create', (req, res) => {
+    try {
+        const { amount, description } = req.body;
+        
+        console.log('💰 Criando pagamento:', { amount });
+        
+        // Validação
+        if (!amount || isNaN(parseFloat(amount))) {
+            return res.status(400).json({
+                success: false,
+                error: 'Valor inválido'
+            });
         }
-    });
+        
+        const numericAmount = parseFloat(amount);
+        
+        if (numericAmount < 0.01) {
+            return res.status(400).json({
+                success: false,
+                error: 'Valor mínimo é R$ 0,01'
+            });
+        }
+        
+        // Gerar ID único
+        const paymentId = `pix-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Gerar QR Code mock
+        const amountInCents = Math.round(numericAmount * 100);
+        const qrCode = `00020101021226890014br.gov.bcb.pix0136${paymentId}52040000530398654${amountInCents.toString().length.toString().padStart(2, '0')}${amountInCents}5802BR5913PIX DINAMICO6008BRASILIA62070503***6304`;
+        
+        // Criar pagamento
+        const payment = {
+            id: paymentId,
+            paymentId,
+            qr_code: qrCode,
+            qr_code_base64: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+            amount: numericAmount,
+            description: description || `Pagamento PIX de R$ ${numericAmount.toFixed(2)}`,
+            status: 'pending',
+            approved: false,
+            createdAt: new Date(),
+            expiresAt: new Date(Date.now() + 30 * 60000)
+        };
+        
+        // Armazenar
+        payments.set(paymentId, payment);
+        
+        console.log(`✅ Pagamento criado: ${paymentId}`);
+        
+        res.json({
+            success: true,
+            data: payment
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erro interno: ' + error.message
+        });
+    }
 });
 
-// Teste simples
-app.get('/api/test', (req, res) => {
-    res.json({ 
-        message: 'API funcionando!',
-        environment: process.env.NODE_ENV || 'development',
-        node: process.version,
-        timestamp: new Date().toISOString()
-    });
+// Verificar status
+app.get('/api/payments/:id/status', (req, res) => {
+    try {
+        const paymentId = req.params.id;
+        
+        console.log(`🔍 Verificando: ${paymentId}`);
+        
+        const payment = payments.get(paymentId);
+        
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                error: 'Pagamento não encontrado'
+            });
+        }
+        
+        // Verificar se deve aprovar automaticamente (para demonstração)
+        const now = new Date();
+        const created = new Date(payment.createdAt);
+        const elapsedSeconds = Math.floor((now - created) / 1000);
+        
+        let approved = payment.approved;
+        let status = payment.status;
+        
+        // Aprovar após 30 segundos
+        if (!approved && elapsedSeconds > 30) {
+            approved = true;
+            status = 'approved';
+            payment.approved = true;
+            payment.status = 'approved';
+            payment.approvedAt = now;
+            console.log(`✅ Aprovado automaticamente: ${paymentId}`);
+        }
+        
+        res.json({
+            success: true,
+            data: {
+                paymentId,
+                status,
+                approved,
+                pending: !approved,
+                amount: payment.amount,
+                elapsed_seconds: elapsedSeconds,
+                created_at: payment.createdAt,
+                expires_at: payment.expiresAt
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erro ao verificar status'
+        });
+    }
 });
 
-// Rota de debug
-app.get('/api/debug', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Sistema de pagamento PIX',
-        version: '1.0.0',
-        features: [
-            'Criação de pagamentos PIX',
-            'QR Code dinâmico',
-            'Webhook para notificações',
-            'Interface responsiva',
-            'Modo sandbox/teste'
-        ],
-        timestamp: new Date().toISOString()
-    });
+// Aprovar manualmente (para testes)
+app.post('/api/payments/:id/approve', (req, res) => {
+    try {
+        const paymentId = req.params.id;
+        
+        const payment = payments.get(paymentId);
+        
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                error: 'Pagamento não encontrado'
+            });
+        }
+        
+        payment.status = 'approved';
+        payment.approved = true;
+        payment.approvedAt = new Date();
+        
+        console.log(`👑 Aprovado manualmente: ${paymentId}`);
+        
+        res.json({
+            success: true,
+            message: 'Pagamento aprovado',
+            data: {
+                paymentId,
+                status: 'approved',
+                approved: true
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erro interno'
+        });
+    }
 });
 
-// 404
+// Listar pagamentos (debug)
+app.get('/api/payments', (req, res) => {
+    try {
+        const allPayments = Array.from(payments.values()).map(p => ({
+            id: p.id,
+            amount: p.amount,
+            status: p.status,
+            approved: p.approved,
+            createdAt: p.createdAt,
+            approvedAt: p.approvedAt
+        }));
+        
+        res.json({
+            success: true,
+            count: allPayments.length,
+            payments: allPayments
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        res.status(500).json({ success: false, error: 'Erro interno' });
+    }
+});
+
+// ============ ROTAS PARA PÁGINAS ============
+
+// Servir página inicial
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/../public/index.html');
+});
+
+// Servir checkout
+app.get('/checkout', (req, res) => {
+    res.sendFile(__dirname + '/../public/checkout.html');
+});
+
+// Servir arquivos estáticos da pasta public
+app.use(express.static(__dirname + '/../public'));
+
+// ============ ROTA 404 ============
 app.use((req, res) => {
-    res.status(404).json({ 
+    res.status(404).json({
         error: 'Rota não encontrada',
-        path: req.path
+        path: req.path,
+        method: req.method
     });
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-    console.error('❌ Erro:', err.stack);
-    res.status(500).json({ 
-        error: 'Erro interno do servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Contate o administrador'
-    });
-});
-
-// Configuração para Vercel
-const PORT = process.env.PORT || 3000;
-
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`
-🚀 Servidor PIX iniciado!
-📡 Porta: ${PORT}
-🌐 Ambiente: ${process.env.NODE_ENV || 'development'}
-📁 Pasta pública: ${path.join(__dirname, '../public')}
-🛣️  Rotas disponíveis:
-   • GET  /                 → Página inicial
-   • GET  /checkout         → Checkout PIX
-   • POST /api/payments/create → Criar pagamento
-   • GET  /api/payments/:id/status → Verificar status
-   • POST /api/payments/webhook → Webhook Mercado Pago
-   • GET  /health           → Health check
-        `);
-    });
-}
-
+// ============ EXPORT PARA VERCEL ============
 module.exports = app;
