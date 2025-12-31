@@ -1022,6 +1022,55 @@
             generateQRCode(fallbackCode);
         }
         
+        // Gerar QR Code
+        function generateQRCode(qrCodeText) {
+            const container = document.getElementById('qrcode-container');
+            
+            if (!qrCodeText) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #666;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px; color: #ff6b6b;"></i>
+                        <p>QR Code não disponível</p>
+                        <button class="btn btn-primary" onclick="copyPixCode()" style="margin-top: 15px;">
+                            <i class="fas fa-copy"></i> Copiar Código PIX
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Usar API do QuickChart (confiável)
+            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrCodeText)}&size=250&margin=2&dark=00bfa5&light=ffffff&format=png`;
+            
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.alt = 'QR Code PIX';
+            img.style.width = '250px';
+            img.style.height = '250px';
+            
+            img.onload = function() {
+                container.innerHTML = '';
+                container.appendChild(img);
+                console.log('✅ QR Code gerado com sucesso!');
+            };
+            
+            img.onerror = function() {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #666;">
+                        <div style="width: 200px; height: 200px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-qrcode" style="font-size: 48px; color: #999;"></i>
+                        </div>
+                        <p>QR Code não pôde ser carregado</p>
+                        <button class="btn btn-primary" onclick="copyPixCode()" style="margin-top: 15px;">
+                            <i class="fas fa-copy"></i> Copiar Código PIX
+                        </button>
+                    </div>
+                `;
+            };
+            
+            img.src = qrCodeUrl;
+        }
+        
         // Contagem regressiva
         function startCountdown() {
             const countdownElement = document.getElementById('countdown');
