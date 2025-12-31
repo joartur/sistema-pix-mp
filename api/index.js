@@ -1,94 +1,50 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
+require('dotenv').config();
+
+// Mercado Pago
+const mercadopago = require('mercadopago');
+
+// Configurar Mercado Pago
+if (process.env.MP_ACCESS_TOKEN) {
+    mercadopago.configure({
+        access_token: process.env.MP_ACCESS_TOKEN,
+        sandbox: process.env.MP_ACCESS_TOKEN.includes('TEST'), // Auto-detect sandbox
+    });
+    console.log('✅ Mercado Pago configurado');
+} else {
+    console.warn('⚠️  MP_ACCESS_TOKEN não configurado');
+}
+
 const app = express();
 
 // Middleware
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    next();
-});
-
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Store em memória
+// Store em memória (em produção, use um banco de dados)
 const payments = new Map();
 
-// ============ GERADOR DE PIX VÁLIDO ============
-
-// Chave PIX de teste (aleatória mas válida)
-function generateValidPixKey() {
-    // Formato: chave aleatória de 32 caracteres (simulando CPF/CNPJ/Email)
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let key = '';
-    for (let i = 0; i < 32; i++) {
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return key + '@teste.com.br'; // Formato de email (mais aceito)
-}
-
-// Gerar payload PIX estático VÁLIDO
-function generateValidPixPayload(amount, description = 'Pagamento', txid = '') {
-    // Valores fixos para teste (aceitos pela maioria dos bancos)
-    const merchantName = 'PAGAMENTO TESTE';
-    const merchantCity = 'SAO PAULO';
-    const pixKey = 'teste@pix.com.br'; // Chave de teste conhecida
-    
-    // Formatar valor
-    const amountStr = amount.toFixed(2);
-    
-    // Payload PIX simplificado mas válido
-    const payload = [
-        '000201', // Payload format indicator
-        '26', // Merchant account information
-        '00', // GUI length
-        '14br.gov.bcb.pix', // GUI
-        '01', // Chave PIX length
-        '16teste@pix.com.br', // Chave PIX de teste
-        '52040000', // Merchant category code
-        '5303986', // Transaction currency (BRL)
-        '54' + amountStr.length.toString().padStart(2, '0') + amountStr, // Transaction amount
-        '5802BR', // Country code
-        '59' + merchantName.length.toString().padStart(2, '0') + merchantName, // Merchant name
-        '60' + merchantCity.length.toString().padStart(2, '0') + merchantCity, // Merchant city
-        '6207', // Additional data field
-        '05', // Reference label length
-        '***', // Reference label (fixo para dinâmico)
-        '6304' // CRC16 placeholder
-    ].join('');
-    
-    // Calcular CRC16 (simplificado)
-    const crc = 'ABCD'; // CRC fixo para teste
-    return payload + crc;
-}
-
-// Gerar payload ALTERNATIVO que funciona na maioria dos apps
-function generateWorkingPixPayload(amount) {
-    // Payload mínimo que funciona
-    return `00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-42661417400052040000530398654${amount.toFixed(2).length.toString().padStart(2, '0')}${amount.toFixed(2)}5802BR5915PAGAMENTO TESTE6009SAO PAULO62070503***6304`;
-}
-
-// ============ ROTAS API ============
+// ============ ROTAS DA API ============
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ 
+    res.json({
         success: true,
-        status: 'ok',
         service: 'PIX Payment API',
-        timestamp: new Date().toISOString(),
-        note: 'Sistema de demonstração - QR Codes para teste'
+        mercadopago: !!process.env.MP_ACCESS_TOKEN,
+        timestamp: new Date().toISOString()
     });
 });
 
-// Criar pagamento PIX
-app.post('/api/payments/create', (req, res) => {
+// Criar pagamento PIX com Mercado Pago
+app.post('/api/payments/create', async (req, res) => {
     try {
-        const { amount, description } = req.body;
+        const { amount, description, customerEmail, customerName } = req.body;
         
-        console.log('💰 Criando PIX:', { amount });
+        console.log('💰 Criando pagamento PIX real:', { amount });
         
         // Validação
         if (!amount || isNaN(parseFloat(amount))) {
@@ -107,61 +63,127 @@ app.post('/api/payments/create', (req, res) => {
             });
         }
         
-        // Gerar ID único
-        const paymentId = `PIX${Date.now()}`;
+        if (numericAmount > 50000) {
+            return res.status(400).json({
+                success: false,
+                error: 'Valor máximo é R$ 50.000,00'
+            });
+        }
         
-        // Gerar payload PIX que FUNCIONA
-        const pixPayload = generateWorkingPixPayload(numericAmount);
+        // Verificar se Mercado Pago está configurado
+        if (!process.env.MP_ACCESS_TOKEN) {
+            return res.status(500).json({
+                success: false,
+                error: 'Sistema de pagamento não configurado'
+            });
+        }
         
-        // Criar pagamento
-        const payment = {
-            id: paymentId,
-            paymentId,
-            pix_payload: pixPayload,
-            qr_code: pixPayload, // Para compatibilidade
-            amount: numericAmount,
-            description: description || `Pagamento de R$ ${numericAmount.toFixed(2)}`,
-            status: 'pending',
-            approved: false,
-            paid: false, // Novo campo: se realmente foi pago
-            created: new Date().toISOString(),
-            expires: new Date(Date.now() + 30 * 60000).toISOString()
+        // Criar pagamento no Mercado Pago
+        const paymentData = {
+            transaction_amount: numericAmount,
+            description: description || `Pagamento PIX de R$ ${numericAmount.toFixed(2)}`,
+            payment_method_id: 'pix',
+            payer: {
+                email: customerEmail || 'cliente@pix.com',
+                first_name: customerName?.split(' ')[0] || 'Cliente',
+                last_name: customerName?.split(' ').slice(1).join(' ') || 'PIX',
+                identification: {
+                    type: 'CPF',
+                    number: '12345678909' // Em produção, peça ao cliente
+                }
+            },
+            notification_url: process.env.MP_WEBHOOK_URL,
+            date_of_expiration: new Date(Date.now() + 30 * 60000).toISOString(),
+            metadata: {
+                system: 'fazmeupix',
+                created_at: new Date().toISOString()
+            }
         };
         
-        // Armazenar
-        payments.set(paymentId, payment);
+        console.log('📤 Enviando para Mercado Pago...');
+        const response = await mercadopago.payment.create(paymentData);
         
-        console.log(`✅ PIX criado: ${paymentId}`);
-        console.log(`📋 Payload (primeiros 50 chars): ${pixPayload.substring(0, 50)}...`);
+        const mpPayment = response.body;
+        
+        console.log('✅ Pagamento criado no Mercado Pago:', mpPayment.id);
+        
+        // Extrair dados do PIX
+        let qrCode = '';
+        let qrCodeBase64 = '';
+        let qrCodeText = '';
+        
+        if (mpPayment.point_of_interaction?.transaction_data) {
+            const pixData = mpPayment.point_of_interaction.transaction_data;
+            qrCode = pixData.qr_code || '';
+            qrCodeBase64 = pixData.qr_code_base64 || '';
+            qrCodeText = pixData.qr_code || pixData.ticket_url || '';
+        }
+        
+        // Armazenar pagamento
+        const payment = {
+            id: mpPayment.id.toString(),
+            paymentId: mpPayment.id.toString(),
+            mp_id: mpPayment.id,
+            qr_code: qrCode,
+            qr_code_base64: qrCodeBase64,
+            qr_code_text: qrCodeText,
+            amount: numericAmount,
+            description: paymentData.description,
+            status: mpPayment.status || 'pending',
+            status_detail: mpPayment.status_detail,
+            created_at: new Date().toISOString(),
+            expires_at: mpPayment.date_of_expiration,
+            mp_data: mpPayment, // Salvar dados completos
+            approved: false,
+            paid: false
+        };
+        
+        payments.set(payment.id, payment);
         
         res.json({
             success: true,
             data: {
-                paymentId,
-                pix_payload: pixPayload,
-                qr_code: pixPayload,
+                paymentId: payment.id,
+                qr_code: qrCode,
+                qr_code_base64: qrCodeBase64,
+                qr_code_text: qrCodeText,
                 amount: numericAmount,
                 description: payment.description,
-                status: 'pending',
-                created_at: payment.created,
-                expires_at: payment.expires,
-                note: 'Este é um QR Code de demonstração. Para pagamentos reais, configure uma chave PIX válida.'
+                status: payment.status,
+                created_at: payment.created_at,
+                expires_at: payment.expires_at,
+                ticket_url: mpPayment.transaction_details?.external_resource_url,
+                point_of_interaction: mpPayment.point_of_interaction
             }
         });
         
     } catch (error) {
-        console.error('❌ Erro:', error);
+        console.error('❌ Erro ao criar pagamento:', error);
+        
+        // Detalhar erro do Mercado Pago
+        let errorMessage = 'Erro ao processar pagamento';
+        if (error.response && error.response.body) {
+            const mpError = error.response.body;
+            errorMessage = mpError.message || JSON.stringify(mpError);
+            console.error('Detalhes MP:', mpError);
+        }
+        
         res.status(500).json({
             success: false,
-            error: 'Erro ao gerar PIX'
+            error: errorMessage,
+            debug: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });
 
-// Verificar status - NÃO APROVA AUTOMATICAMENTE!
-app.get('/api/payments/:id/status', (req, res) => {
+// Verificar status do pagamento
+app.get('/api/payments/:id/status', async (req, res) => {
     try {
         const paymentId = req.params.id;
+        
+        console.log(`🔍 Verificando status real: ${paymentId}`);
+        
+        // Buscar do cache
         const payment = payments.get(paymentId);
         
         if (!payment) {
@@ -171,24 +193,57 @@ app.get('/api/payments/:id/status', (req, res) => {
             });
         }
         
-        // NÃO APROVAR AUTOMATICAMENTE - apenas retornar status atual
+        // Verificar status no Mercado Pago
+        let mpStatus = payment.status;
+        let approved = payment.approved;
+        
+        if (process.env.MP_ACCESS_TOKEN) {
+            try {
+                const response = await mercadopago.payment.get(payment.mp_id);
+                const mpPayment = response.body;
+                
+                mpStatus = mpPayment.status;
+                
+                // Atualizar cache
+                payment.status = mpStatus;
+                payment.status_detail = mpPayment.status_detail;
+                
+                // Verificar se foi aprovado
+                if (mpStatus === 'approved') {
+                    approved = true;
+                    payment.approved = true;
+                    payment.paid = true;
+                    payment.approved_at = new Date().toISOString();
+                    console.log(`✅ Pagamento confirmado: ${paymentId}`);
+                }
+                
+            } catch (mpError) {
+                console.error('Erro ao verificar no MP:', mpError.message);
+                // Continuar com status do cache
+            }
+        }
+        
+        const created = new Date(payment.created_at);
+        const now = new Date();
+        const elapsed = Math.floor((now - created) / 1000);
+        
         res.json({
             success: true,
             data: {
                 paymentId,
-                status: payment.status,
-                approved: payment.approved,
-                paid: payment.paid || false, // Importante: mostra se foi realmente pago
-                pending: !payment.approved,
+                status: mpStatus,
+                approved,
+                pending: !approved && mpStatus === 'pending',
+                elapsed_seconds: elapsed,
                 amount: payment.amount,
-                created: payment.created,
-                expires: payment.expires,
-                real_payment: payment.paid || false
+                created_at: payment.created_at,
+                expires_at: payment.expires_at,
+                status_detail: payment.status_detail
             }
         });
         
     } catch (error) {
-        console.error('❌ Erro:', error);
+        console.error('❌ Erro ao verificar status:', error);
         res.status(500).json({
             success: false,
             error: 'Erro ao verificar status'
@@ -196,10 +251,66 @@ app.get('/api/payments/:id/status', (req, res) => {
     }
 });
 
-// Webhook para quando usuário REALMENTE pagar
-app.post('/api/payments/:id/pay', (req, res) => {
+// Webhook do Mercado Pago
+app.post('/api/payments/webhook', async (req, res) => {
+    try {
+        const { id, type } = req.body;
+        
+        console.log('🔔 Webhook recebido:', { id, type });
+        
+        if (type === 'payment') {
+            const paymentId = id.toString();
+            
+            // Verificar pagamento no Mercado Pago
+            if (process.env.MP_ACCESS_TOKEN) {
+                try {
+                    const response = await mercadopago.payment.get(id);
+                    const mpPayment = response.body;
+                    
+                    console.log(`📊 Status do webhook: ${mpPayment.status}`);
+                    
+                    // Buscar pagamento local
+                    const payment = payments.get(paymentId);
+                    
+                    if (payment) {
+                        // Atualizar status
+                        payment.status = mpPayment.status;
+                        payment.status_detail = mpPayment.status_detail;
+                        
+                        if (mpPayment.status === 'approved') {
+                            payment.approved = true;
+                            payment.paid = true;
+                            payment.approved_at = new Date().toISOString();
+                            console.log(`✅ Webhook: Pagamento aprovado - ${paymentId}`);
+                        }
+                        
+                        // Se for rejeitado
+                        if (mpPayment.status === 'rejected') {
+                            console.log(`❌ Webhook: Pagamento rejeitado - ${paymentId}`);
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro no webhook MP:', error);
+                }
+            }
+        }
+        
+        res.status(200).json({ received: true });
+        
+    } catch (error) {
+        console.error('❌ Erro no webhook:', error);
+        res.status(500).json({ error: 'Erro no webhook' });
+    }
+});
+
+// Aprovação manual (apenas para testes em sandbox)
+app.post('/api/payments/:id/approve', async (req, res) => {
     try {
         const paymentId = req.params.id;
+        
+        console.log(`⚠️  Aprovação manual (apenas sandbox): ${paymentId}`);
+        
         const payment = payments.get(paymentId);
         
         if (!payment) {
@@ -209,23 +320,27 @@ app.post('/api/payments/:id/pay', (req, res) => {
             });
         }
         
-        // Marcar como REALMENTE pago
-        payment.status = 'paid';
+        // Só permitir aprovação manual em sandbox
+        if (!process.env.MP_ACCESS_TOKEN?.includes('TEST')) {
+            return res.status(403).json({
+                success: false,
+                error: 'Aprovação manual só disponível em modo sandbox'
+            });
+        }
+        
+        payment.status = 'approved';
         payment.approved = true;
-        payment.paid = true;
-        payment.paid_at = new Date().toISOString();
+        payment.approved_at = new Date().toISOString();
         
-        console.log(`💰✅ Pagamento REAL registrado: ${paymentId}`);
+        console.log(`✅ Aprovado manualmente: ${paymentId}`);
         
         res.json({
             success: true,
             data: {
                 paymentId,
-                status: 'paid',
+                status: 'approved',
                 approved: true,
-                paid: true,
-                paid_at: payment.paid_at,
-                message: 'Pagamento confirmado com sucesso!'
+                approved_at: payment.approved_at
             }
         });
         
@@ -233,67 +348,30 @@ app.post('/api/payments/:id/pay', (req, res) => {
         console.error('❌ Erro:', error);
         res.status(500).json({
             success: false,
-            error: 'Erro ao registrar pagamento'
+            error: 'Erro interno'
         });
     }
 });
 
-// Rota para o usuário confirmar que pagou (manual)
-app.post('/api/payments/:id/confirm', (req, res) => {
-    try {
-        const paymentId = req.params.id;
-        const payment = payments.get(paymentId);
-        
-        if (!payment) {
-            return res.status(404).json({
-                success: false,
-                error: 'Pagamento não encontrado'
-            });
-        }
-        
-        payment.status = 'confirmed_by_user';
-        payment.user_confirmed = true;
-        payment.confirmed_at = new Date().toISOString();
-        
-        console.log(`👤 Usuário confirmou pagamento: ${paymentId}`);
-        
-        res.json({
-            success: true,
-            data: {
-                paymentId,
-                status: 'confirmed_by_user',
-                user_confirmed: true,
-                confirmed_at: payment.confirmed_at,
-                message: 'Você confirmou que realizou o pagamento.'
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ Erro:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Erro ao confirmar pagamento'
-        });
-    }
-});
-
-// Listar pagamentos
+// Listar pagamentos (apenas para debug)
 app.get('/api/payments', (req, res) => {
+    const allPayments = Array.from(payments.values()).map(p => ({
+        id: p.id,
+        amount: p.amount,
+        status: p.status,
+        approved: p.approved,
+        created: p.created_at,
+        mp_id: p.mp_id
+    }));
+    
     res.json({
         success: true,
-        count: payments.size,
-        payments: Array.from(payments.entries()).map(([id, p]) => ({
-            id,
-            amount: p.amount,
-            status: p.status,
-            approved: p.approved,
-            paid: p.paid || false,
-            created: p.created
-        }))
+        count: allPayments.length,
+        payments: allPayments
     });
 });
 
-// ============ PÁGINAS ============
+// ============ ROTAS DE PÁGINAS ============
 
 // Página inicial
 app.get('/', (req, res) => {
@@ -305,97 +383,41 @@ app.get('/checkout', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/checkout.html'));
 });
 
-// Painel de controle para testes
-app.get('/admin', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Admin - Testes PIX</title>
-            <style>
-                body { font-family: Arial; padding: 20px; }
-                .payment { border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 5px; }
-                button { padding: 5px 10px; margin: 2px; }
-            </style>
-        </head>
-        <body>
-            <h1>🏪 Painel de Testes PIX</h1>
-            
-            <h3>Criar Pagamento de Teste</h3>
-            <input type="number" id="amount" value="0.01" step="0.01">
-            <button onclick="createPayment()">Criar PIX</button>
-            
-            <h3>Pagamentos Ativos</h3>
-            <div id="payments"></div>
-            
-            <script>
-                async function createPayment() {
-                    const amount = document.getElementById('amount').value;
-                    const res = await fetch('/api/payments/create', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ amount })
-                    });
-                    
-                    const data = await res.json();
-                    if (data.success) {
-                        alert('PIX criado: ' + data.data.paymentId);
-                        loadPayments();
-                    }
-                }
-                
-                async function loadPayments() {
-                    const res = await fetch('/api/payments');
-                    const data = await res.json();
-                    
-                    const container = document.getElementById('payments');
-                    container.innerHTML = '';
-                    
-                    data.payments.forEach(p => {
-                        const div = document.createElement('div');
-                        div.className = 'payment';
-                        div.innerHTML = \`
-                            <strong>\${p.id}</strong><br>
-                            Valor: R$ \${p.amount.toFixed(2)}<br>
-                            Status: \${p.status}<br>
-                            Pago: \${p.paid ? '✅' : '❌'}<br>
-                            <button onclick="markAsPaid('\${p.id}')">Marcar como Pago</button>
-                            <button onclick="openCheckout('\${p.id}')">Abrir Checkout</button>
-                        \`;
-                        container.appendChild(div);
-                    });
-                }
-                
-                async function markAsPaid(paymentId) {
-                    const res = await fetch(\`/api/payments/\${paymentId}/pay\`, {
-                        method: 'POST'
-                    });
-                    
-                    const data = await res.json();
-                    if (data.success) {
-                        alert('✅ Marcado como pago!');
-                        loadPayments();
-                    }
-                }
-                
-                function openCheckout(paymentId) {
-                    window.open(\`/checkout?paymentId=\${paymentId}\`, '_blank');
-                }
-                
-                // Carregar pagamentos ao abrir
-                loadPayments();
-            </script>
-        </body>
-        </html>
-    `);
+// Teste
+app.get('/test', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/test.html'));
 });
 
 // Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
 
-// 404
+// 404 Handler
 app.use((req, res) => {
-    res.status(404).send('Página não encontrada');
+    res.status(404).send(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>404</title></head>
+        <body>
+            <h1>404 - Página não encontrada</h1>
+            <p><a href="/">Voltar</a></p>
+        </body>
+        </html>
+    `);
+});
+
+// Error Handler
+app.use((err, req, res, next) => {
+    console.error('🔥 Erro:', err);
+    res.status(500).send(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Erro</title></head>
+        <body>
+            <h1>Erro interno</h1>
+            <p><a href="/">Voltar</a></p>
+        </body>
+        </html>
+    `);
 });
 
 // Export

@@ -362,14 +362,16 @@
         // Criar pagamento
         async function createPayment() {
             try {
-                console.log('Criando pagamento PIX...');
+                console.log('📤 Criando pagamento PIX real...');
                 
                 const response = await fetch('/api/payments/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         amount: pixAmount,
-                        description: `Pagamento PIX R$ ${pixAmount.toFixed(2)}`
+                        description: `Pagamento PIX de R$ ${pixAmount.toFixed(2)}`,
+                        customerEmail: 'cliente@email.com',
+                        customerName: 'Cliente PIX'
                     })
                 });
                 
@@ -380,92 +382,159 @@
                 }
                 
                 currentPayment = data.data;
-                console.log('✅ PIX criado:', currentPayment.paymentId);
+                console.log('✅ Pagamento criado:', currentPayment);
                 
-                // Gerar QR Code
-                generateQRCode(currentPayment.pix_payload || currentPayment.qr_code);
+                // Usar qr_code_text (código PIX copia e cola)
+                const pixCode = currentPayment.qr_code_text || currentPayment.qr_code;
+                
+                if (pixCode) {
+                    console.log('📋 Código PIX:', pixCode.substring(0, 100) + '...');
+                    
+                    // Gerar QR Code da URL do Mercado Pago
+                    generateQRCodeFromMP(pixCode);
+                    
+                    // Armazenar para copiar
+                    window.pixCodeForCopy = pixCode;
+                    
+                    // Mostrar informações adicionais
+                    if (currentPayment.ticket_url) {
+                        console.log('🎫 Ticket URL:', currentPayment.ticket_url);
+                        
+                        // Adicionar link para ticket
+                        const container = document.getElementById('qrcode-container');
+                        const linkDiv = document.createElement('div');
+                        linkDiv.innerHTML = `
+                            <a href="${currentPayment.ticket_url}" target="_blank" 
+                            style="display:inline-block; margin-top:10px; color:#0066cc;">
+                            <i class="fas fa-external-link-alt"></i> Abrir comprovante
+                            </a>
+                        `;
+                        container.appendChild(linkDiv);
+                    }
+                } else {
+                    showError('QR Code não disponível');
+                }
                 
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('❌ Erro ao criar pagamento:', error);
+                showError('Erro: ' + error.message);
                 throw error;
             }
         }
-        
-        // Gerar QR Code
-        function generateQRCode(pixPayload) {
+
+        // Gerar QR Code a partir do código do Mercado Pago
+        function generateQRCodeFromMP(pixCode) {
             const container = document.getElementById('qrcode-container');
             
-            if (!pixPayload) {
-                container.innerHTML = '<p style="color:#F44336;">❌ Erro ao gerar QR Code</p>';
+            // Se o Mercado Pago retornar URL, usar ela
+            if (pixCode.startsWith('http')) {
+                // Mostrar instruções
+                container.innerHTML = `
+                    <div style="text-align: center;">
+                        <p style="color: #666; margin-bottom: 15px;">
+                            <i class="fas fa-external-link-alt"></i> 
+                            Pagamento gerado no Mercado Pago
+                        </p>
+                        <a href="${pixCode}" target="_blank" 
+                        style="display: inline-block; padding: 12px 24px; 
+                                background: #00BFA5; color: white; 
+                                border-radius: 8px; text-decoration: none;">
+                            <i class="fas fa-qrcode"></i> Abrir QR Code
+                        </a>
+                        <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                            Clique no botão acima para ver o QR Code
+                        </p>
+                    </div>
+                `;
                 return;
             }
             
-            // Usar QuickChart.io para QR Code
-            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(pixPayload)}&size=250&margin=2&dark=000000&light=ffffff&format=png`;
+            // Se for código PIX, gerar QR Code
+            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(pixCode)}&size=280&margin=1&dark=000000&light=ffffff&format=png`;
             
             const img = new Image();
             img.alt = 'QR Code PIX';
-            img.style.width = '250px';
-            img.style.height = '250px';
+            img.style.width = '280px';
+            img.style.height = '280px';
+            img.style.border = '10px solid white';
+            img.style.borderRadius = '10px';
+            img.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
             
             img.onload = function() {
                 container.innerHTML = '';
                 container.appendChild(img);
-                console.log('✅ QR Code gerado');
                 
-                // Adicionar texto abaixo
-                const text = document.createElement('p');
-                text.textContent = 'Escaneie com seu app bancário';
-                text.style.color = '#666';
-                text.style.marginTop = '10px';
-                container.appendChild(text);
+                // Adicionar instruções
+                const instructions = document.createElement('div');
+                instructions.innerHTML = `
+                    <div style="margin-top: 15px; color: #666; font-size: 14px;">
+                        <p><strong>Para pagar:</strong></p>
+                        <ol style="text-align: left; margin: 10px auto; max-width: 250px;">
+                            <li>Abra seu app bancário</li>
+                            <li>Toque em "Pagar com PIX"</li>
+                            <li>Aponte a câmera para o código</li>
+                            <li>Confirme o pagamento</li>
+                        </ol>
+                        <p style="color: #ff9800; margin-top: 10px;">
+                            <i class="fas fa-clock"></i> Válido por 30 minutos
+                        </p>
+                    </div>
+                `;
+                container.appendChild(instructions);
+                
+                console.log('✅ QR Code PIX gerado com sucesso!');
             };
             
             img.onerror = function() {
                 // Fallback
-                const fallbackUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixPayload)}`;
+                const fallbackUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`;
                 img.src = fallbackUrl;
             };
             
             img.src = qrCodeUrl;
         }
-        
-        // Contagem regressiva
-        function startCountdown() {
-            const countdownElement = document.getElementById('countdown');
-            
-            countdownInterval = setInterval(() => {
-                countdownTime--;
-                
-                const minutes = Math.floor(countdownTime / 60);
-                const seconds = countdownTime % 60;
-                
-                countdownElement.textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (countdownTime <= 0) {
-                    clearInterval(countdownInterval);
-                    showError('Tempo esgotado');
-                }
-            }, 1000);
-        }
-        
-        // Verificar status
+
+        // Atualize também a função startStatusVerification:
         function startStatusVerification() {
             if (!currentPayment) return;
             
+            console.log('🔄 Iniciando verificação de status real...');
+            
             statusInterval = setInterval(async () => {
                 try {
+                    console.log(`🔍 Verificando status real: ${currentPayment.paymentId}`);
+                    
                     const response = await fetch(`/api/payments/${currentPayment.paymentId}/status`);
                     const data = await response.json();
                     
                     if (data.success) {
+                        console.log('📊 Status recebido:', data.data);
                         updatePaymentStatus(data.data);
+                        
+                        // Só parar se realmente foi aprovado
+                        if (data.data.approved && data.data.status === 'approved') {
+                            console.log('✅ Pagamento REALMENTE confirmado! Parando verificações...');
+                            clearInterval(statusInterval);
+                            clearInterval(countdownInterval);
+                            showSuccess();
+                        }
+                        
+                        // Mostrar status detalhado
+                        const statusElement = document.getElementById('payment-status');
+                        const detail = statusElement.querySelector('.status-content p');
+                        if (detail && data.data.status_detail) {
+                            detail.innerHTML = `
+                                ${data.data.status_detail}<br>
+                                <small>Tempo: ${data.data.elapsed_seconds}s</small>
+                            `;
+                        }
+                    } else {
+                        console.warn('⚠️  Erro na verificação:', data.error);
                     }
                 } catch (error) {
-                    console.error('Erro ao verificar:', error);
+                    console.error('❌ Erro ao verificar status:', error);
                 }
-            }, 5000); // A cada 5 segundos
+            }, 5000); // Verificar a cada 5 segundos
         }
         
         // Atualizar status

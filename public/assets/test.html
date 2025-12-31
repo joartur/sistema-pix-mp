@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Mercado Pago</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .card { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .sandbox { background: #ffc107; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Mercado Pago</h1>
+    
+    <div class="card">
+        <h3>Status do Sistema</h3>
+        <div id="system-status">Verificando...</div>
+    </div>
+    
+    <div class="card">
+        <h3>Testar PIX</h3>
+        
+        <div class="sandbox">
+            <strong>⚠️ MODO SANDBOX</strong><br>
+            Use valores pequenos para teste
+        </div>
+        
+        <button onclick="testPix(0.01)">PIX R$ 0,01</button>
+        <button onclick="testPix(1.00)">PIX R$ 1,00</button>
+        <button onclick="testPix(10.00)">PIX R$ 10,00</button>
+        
+        <div style="margin-top: 15px;">
+            <input type="number" id="custom-amount" placeholder="Outro valor" step="0.01" min="0.01" style="padding: 8px;">
+            <button onclick="testCustomAmount()">Testar</button>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Resultado</h3>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        // Verificar status do sistema
+        async function checkSystemStatus() {
+            try {
+                const res = await fetch('/api/health');
+                const data = await res.json();
+                
+                const statusDiv = document.getElementById('system-status');
+                if (data.success) {
+                    statusDiv.innerHTML = `
+                        ✅ Sistema funcionando<br>
+                        📊 Mercado Pago: ${data.mercadopago ? '✅ Configurado' : '❌ Não configurado'}
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('system-status').innerHTML = '❌ Sistema offline';
+            }
+        }
+        
+        // Testar PIX
+        async function testPix(amount) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>⏳ Criando PIX...</p>';
+            
+            try {
+                const response = await fetch('/api/payments/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: amount.toString(),
+                        description: `Teste PIX R$ ${amount.toFixed(2)}`
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const payment = data.data;
+                    
+                    resultDiv.innerHTML = `
+                        <div style="background: #d4edda; padding: 15px; border-radius: 5px;">
+                            <h4>✅ PIX Criado com Sucesso!</h4>
+                            <p><strong>ID:</strong> ${payment.paymentId}</p>
+                            <p><strong>Valor:</strong> R$ ${payment.amount.toFixed(2)}</p>
+                            <p><strong>Status:</strong> ${payment.status}</p>
+                            
+                            ${payment.qr_code_base64 ? `
+                                <p><strong>QR Code:</strong></p>
+                                <img src="${payment.qr_code_base64}" 
+                                     alt="QR Code" 
+                                     style="max-width: 200px; border: 1px solid #ccc;">
+                            ` : ''}
+                            
+                            ${payment.ticket_url ? `
+                                <p><a href="${payment.ticket_url}" target="_blank">Abrir QR Code no Mercado Pago</a></p>
+                            ` : ''}
+                            
+                            <div style="margin-top: 15px;">
+                                <button onclick="checkPaymentStatus('${payment.paymentId}')">Verificar Status</button>
+                                <button onclick="openCheckout(${amount})">Abrir Página de Pagamento</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    console.log('✅ Pagamento criado:', payment);
+                    
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="background: #f8d7da; padding: 15px; border-radius: 5px;">
+                            <h4>❌ Erro</h4>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 5px;">
+                        <h4>❌ Erro de Conexão</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function checkPaymentStatus(paymentId) {
+            try {
+                const response = await fetch(`/api/payments/${paymentId}/status`);
+                const data = await response.json();
+                
+                const resultDiv = document.getElementById('result');
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 5px;">
+                            <h4>🔍 Status do Pagamento</h4>
+                            <p><strong>ID:</strong> ${data.data.paymentId}</p>
+                            <p><strong>Status:</strong> ${data.data.status}</p>
+                            <p><strong>Detalhe:</strong> ${data.data.status_detail || 'N/A'}</p>
+                            <p><strong>Aprovado:</strong> ${data.data.approved ? '✅ Sim' : '❌ Não'}</p>
+                            <p><strong>Tempo:</strong> ${data.data.elapsed_seconds} segundos</p>
+                            
+                            ${!data.data.approved ? `
+                                <div style="margin-top: 10px;">
+                                    <button onclick="simulatePayment('${paymentId}')">Simular Pagamento (Sandbox)</button>
+                                    <small style="display:block;color:#666;">
+                                        Apenas para testes em sandbox
+                                    </small>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+        
+        async function simulatePayment(paymentId) {
+            if (!confirm('Isso simulará um pagamento. Continuar?')) return;
+            
+            try {
+                const response = await fetch(`/api/payments/${paymentId}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Pagamento simulado com sucesso!');
+                    checkPaymentStatus(paymentId);
+                } else {
+                    alert('❌ Erro: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Erro de conexão');
+            }
+        }
+        
+        function openCheckout(amount) {
+            window.open(`/checkout?amount=${amount}`, '_blank');
+        }
+        
+        function testCustomAmount() {
+            const amount = parseFloat(document.getElementById('custom-amount').value);
+            if (amount && amount >= 0.01) {
+                testPix(amount);
+            } else {
+                alert('Digite um valor válido (mínimo R$ 0,01)');
+            }
+        }
+        
+        // Inicializar
+        checkSystemStatus();
+    </script>
+</body>
+</html>
