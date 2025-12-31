@@ -941,85 +941,40 @@
         
         // Criar pagamento
         async function createPayment() {
-            console.log('💳 Iniciando criação de pagamento...');
-            
             try {
+                console.log('📤 Criando pagamento...');
+                
                 const response = await fetch('/api/payments/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         amount: pixAmount,
-                        description: `Pagamento PIX de R$ ${pixAmount.toFixed(2)}`
+                        description: `Pagamento PIX de R$ ${pixAmount.toFixed(2)}`,
+                        customerEmail: 'pagador@pix.com',
+                        customerName: 'Pagador'
                     })
                 });
-
+                
                 const data = await response.json();
                 
-                console.log('📦 Resposta da API:', {
-                    success: data.success,
-                    hasData: !!data.data,
-                    warning: data.warning
-                });
-                
                 if (!data.success) {
-                    // Tenta novamente com fallback
-                    console.log('🔄 Tentando fallback...');
-                    await createPaymentFallback();
-                    return;
+                    throw new Error(data.error || 'Erro ao criar pagamento');
                 }
-
+                
                 currentPayment = data.data;
+                console.log('✅ Pagamento criado:', currentPayment.paymentId);
                 
-                console.log('✅ Pagamento recebido:', {
-                    id: currentPayment.paymentId,
-                    amount: currentPayment.amount,
-                    hasQRCode: !!currentPayment.qr_code
-                });
-                
-                // Gerar QR Code (mesmo que seja mock)
+                // Gerar QR Code
                 if (currentPayment.qr_code) {
                     generateQRCode(currentPayment.qr_code);
-                    startPaymentVerification();
                 } else {
-                    console.warn('⚠️ Sem QR Code, gerando fallback');
-                    generateFallbackQRCode();
+                    showError('QR Code não disponível');
                 }
                 
-                document.getElementById('copy-pix-btn').disabled = false;
-
             } catch (error) {
-                console.error('❌ Erro na API, usando fallback local:', error);
-                await createPaymentFallback();
+                console.error('❌ Erro ao criar pagamento:', error);
+                throw error;
             }
-        }
-
-        // Função de fallback que SEMPRE funciona
-        async function createPaymentFallback() {
-            console.log('🔄 Criando pagamento fallback local...');
-            
-            const paymentId = `local-${Date.now()}`;
-            const qrCode = `00020101021226890014br.gov.bcb.pix0136${paymentId}52040000530398654${Math.round(pixAmount * 100).toString().length.toString().padStart(2, '0')}${Math.round(pixAmount * 100)}5802BR5913PIX LOCAL6008BRASILIA62070503***6304`;
-            
-            currentPayment = {
-                paymentId: paymentId,
-                qr_code: qrCode,
-                amount: pixAmount,
-                status: 'pending',
-                created_at: new Date().toISOString(),
-                isFallback: true
-            };
-            
-            console.log('✅ Fallback criado:', currentPayment.paymentId);
-            
-            generateQRCode(currentPayment.qr_code);
-            startPaymentVerification();
-            document.getElementById('copy-pix-btn').disabled = false;
-        }
-
-        // Adicione esta função também
-        function generateFallbackQRCode() {
-            const fallbackCode = `00020101021226890014br.gov.bcb.pix0136fallback-${Date.now()}520400005303986540510005802BR5913PIX SISTEMA6008BRASILIA62070503***6304`;
-            generateQRCode(fallbackCode);
         }
         
         // Gerar QR Code
