@@ -307,144 +307,6 @@
     </div>
 
     <script>
-    let checkoutStatusInterval = null;
-
-    function startCheckoutAutoStatusCheck(paymentId) {
-        if (checkoutStatusInterval) {
-            clearInterval(checkoutStatusInterval);
-        }
-        
-        checkoutStatusInterval = setInterval(async () => {
-            await checkPaymentStatus();
-        }, 10000); // Verificar a cada 10 segundos
-        
-        console.log(`🔍 Checkout: Iniciando verificação automática para: ${paymentId}`);
-    }
-
-    // Modifique a função loadPaymentData
-    async function loadPaymentData() {
-        try {
-            // Tentar obter dados da sessionStorage
-            const storedData = sessionStorage.getItem('pixPaymentData');
-            
-            if (storedData) {
-                paymentData = JSON.parse(storedData);
-                updateUI();
-                startCountdown();
-                
-                // Iniciar verificação automática
-                startCheckoutAutoStatusCheck(paymentData.paymentId);
-                return;
-            }
-            
-            // Se não houver dados armazenados, mostrar erro
-            showError(
-                "Nenhum pagamento encontrado", 
-                "Volte à página inicial e gere um novo PIX"
-            );
-            
-        } catch (error) {
-            console.error('Erro ao carregar dados:', error);
-            showError(
-                "Erro ao carregar pagamento", 
-                error.message || "Tente novamente mais tarde"
-            );
-        }
-    }
-
-    // Modifique a função checkPaymentStatus no checkout
-    async function checkPaymentStatus() {
-        if (!paymentData?.paymentId) {
-            showNotification("Nenhum pagamento carregado", "warning");
-            return;
-        }
-        
-        showNotification("Verificando status...", "info");
-        
-        try {
-            const response = await fetch(`${API_BASE}/payments/${paymentData.paymentId}/status`);
-            
-            if (!response.ok) {
-                throw new Error(`Erro ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.error);
-            }
-            
-            // Atualizar dados
-            paymentData.status = result.data.status;
-            paymentData.approved = result.data.approved;
-            paymentData.paid = result.data.paid;
-            sessionStorage.setItem('pixPaymentData', JSON.stringify(paymentData));
-            
-            // Atualizar UI
-            updateStatusUI(result.data.status || 'pending');
-            
-            if (result.data.approved || result.data.paid) {
-                showNotification("✅ Pagamento aprovado com sucesso!", "success");
-                
-                // Parar verificação automática
-                if (checkoutStatusInterval) {
-                    clearInterval(checkoutStatusInterval);
-                    checkoutStatusInterval = null;
-                }
-                
-                // Atualizar botões
-                const checkStatusBtn = document.getElementById('checkStatusBtn');
-                const markPaidBtn = document.getElementById('markPaidBtn');
-                
-                checkStatusBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Pagamento Confirmado';
-                checkStatusBtn.classList.remove('primary-gradient');
-                checkStatusBtn.classList.add('success-gradient', 'cursor-not-allowed');
-                checkStatusBtn.disabled = true;
-                
-                markPaidBtn.innerHTML = '<i class="fas fa-check-circle mr-3 text-xl"></i>Pagamento Confirmado';
-                markPaidBtn.classList.remove('success-gradient');
-                markPaidBtn.classList.add('bg-emerald-700', 'cursor-not-allowed');
-                markPaidBtn.disabled = true;
-                
-                // Parar timer
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    document.getElementById('countdown').textContent = 'PAGO';
-                    document.getElementById('countdown').classList.remove('text-gray-900', 'text-red-600', 'text-amber-600');
-                    document.getElementById('countdown').classList.add('text-emerald-600');
-                }
-                
-            } else if (result.data.expired) {
-                showNotification("❌ Pagamento expirado. Gere um novo PIX.", "error");
-                if (checkoutStatusInterval) {
-                    clearInterval(checkoutStatusInterval);
-                    checkoutStatusInterval = null;
-                }
-            } else {
-                showNotification("Aguardando confirmação do pagamento...", "info");
-            }
-            
-        } catch (error) {
-            console.error('Erro ao verificar status:', error);
-            showNotification("Erro ao verificar status", "error");
-        }
-    }
-
-    if (result.data.approved || result.data.paid) {
-        showNotification("✅ Pagamento aprovado! Redirecionando...", "success");
-        
-        // Parar verificações
-        if (statusCheckInterval) {
-            clearInterval(statusCheckInterval);
-            statusCheckInterval = null;
-        }
-        
-        // Redirecionar para página de sucesso após 2 segundos
-        setTimeout(() => {
-            window.location.href = '/success';
-        }, 2000);
-    }   
-
         // Usar caminhos relativos para a API
         const API_BASE = '/api';
         
@@ -706,6 +568,144 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadPaymentData();
         });
+
+    let checkoutStatusInterval = null;
+
+    function startCheckoutAutoStatusCheck(paymentId) {
+        if (checkoutStatusInterval) {
+            clearInterval(checkoutStatusInterval);
+        }
+        
+        checkoutStatusInterval = setInterval(async () => {
+            await checkPaymentStatus();
+        }, 10000); // Verificar a cada 10 segundos
+        
+        console.log(`🔍 Checkout: Iniciando verificação automática para: ${paymentId}`);
+    }
+
+    // Modifique a função loadPaymentData
+    async function loadPaymentData() {
+        try {
+            // Tentar obter dados da sessionStorage
+            const storedData = sessionStorage.getItem('pixPaymentData');
+            
+            if (storedData) {
+                paymentData = JSON.parse(storedData);
+                updateUI();
+                startCountdown();
+                
+                // Iniciar verificação automática
+                startCheckoutAutoStatusCheck(paymentData.paymentId);
+                return;
+            }
+            
+            // Se não houver dados armazenados, mostrar erro
+            showError(
+                "Nenhum pagamento encontrado", 
+                "Volte à página inicial e gere um novo PIX"
+            );
+            
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            showError(
+                "Erro ao carregar pagamento", 
+                error.message || "Tente novamente mais tarde"
+            );
+        }
+    }
+
+    // Modifique a função checkPaymentStatus no checkout
+    async function checkPaymentStatus() {
+        if (!paymentData?.paymentId) {
+            showNotification("Nenhum pagamento carregado", "warning");
+            return;
+        }
+        
+        showNotification("Verificando status...", "info");
+        
+        try {
+            const response = await fetch(`${API_BASE}/payments/${paymentData.paymentId}/status`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+            
+            // Atualizar dados
+            paymentData.status = result.data.status;
+            paymentData.approved = result.data.approved;
+            paymentData.paid = result.data.paid;
+            sessionStorage.setItem('pixPaymentData', JSON.stringify(paymentData));
+            
+            // Atualizar UI
+            updateStatusUI(result.data.status || 'pending');
+            
+            if (result.data.approved || result.data.paid) {
+                showNotification("✅ Pagamento aprovado com sucesso!", "success");
+                
+                // Parar verificação automática
+                if (checkoutStatusInterval) {
+                    clearInterval(checkoutStatusInterval);
+                    checkoutStatusInterval = null;
+                }
+                
+                // Atualizar botões
+                const checkStatusBtn = document.getElementById('checkStatusBtn');
+                const markPaidBtn = document.getElementById('markPaidBtn');
+                
+                checkStatusBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Pagamento Confirmado';
+                checkStatusBtn.classList.remove('primary-gradient');
+                checkStatusBtn.classList.add('success-gradient', 'cursor-not-allowed');
+                checkStatusBtn.disabled = true;
+                
+                markPaidBtn.innerHTML = '<i class="fas fa-check-circle mr-3 text-xl"></i>Pagamento Confirmado';
+                markPaidBtn.classList.remove('success-gradient');
+                markPaidBtn.classList.add('bg-emerald-700', 'cursor-not-allowed');
+                markPaidBtn.disabled = true;
+                
+                // Parar timer
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown').textContent = 'PAGO';
+                    document.getElementById('countdown').classList.remove('text-gray-900', 'text-red-600', 'text-amber-600');
+                    document.getElementById('countdown').classList.add('text-emerald-600');
+                }
+                
+            } else if (result.data.expired) {
+                showNotification("❌ Pagamento expirado. Gere um novo PIX.", "error");
+                if (checkoutStatusInterval) {
+                    clearInterval(checkoutStatusInterval);
+                    checkoutStatusInterval = null;
+                }
+            } else {
+                showNotification("Aguardando confirmação do pagamento...", "info");
+            }
+            
+        } catch (error) {
+            console.error('Erro ao verificar status:', error);
+            showNotification("Erro ao verificar status", "error");
+        }
+    }
+
+    if (result.data.approved || result.data.paid) {
+        showNotification("✅ Pagamento aprovado! Redirecionando...", "success");
+        
+        // Parar verificações
+        if (statusCheckInterval) {
+            clearInterval(statusCheckInterval);
+            statusCheckInterval = null;
+        }
+        
+        // Redirecionar para página de sucesso após 2 segundos
+        setTimeout(() => {
+            window.location.href = '/success';
+        }, 2000);
+    }   
     </script>
 </body>
 </html>
