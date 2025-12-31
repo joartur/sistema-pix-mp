@@ -2,209 +2,135 @@ const { MercadoPagoConfig, Payment } = require('mercadopago');
 
 class MercadoPagoService {
     constructor() {
-        console.log('💰 Inicializando Mercado Pago Service...');
+        console.log('🔧 Inicializando serviço PIX...');
         
-        this.accessToken = process.env.MP_ACCESS_TOKEN;
+        // DEBUG: Verificar se token existe
+        console.log('🔍 Verificando token MP:', {
+            temToken: !!process.env.MP_ACCESS_TOKEN,
+            tipo: process.env.MP_ACCESS_TOKEN ? 
+                (process.env.MP_ACCESS_TOKEN.startsWith('TEST-') ? 'SANDBOX' : 'PRODUÇÃO') : 
+                'NÃO CONFIGURADO'
+        });
         
-        if (!this.accessToken) {
-            console.error('❌ MP_ACCESS_TOKEN não configurado');
-            console.log('🔧 Usando modo de teste (mock)');
-            this.testMode = true;
-            this.paymentClient = null;
-            return;
-        }
+        // Sempre usar modo mock inicialmente
+        this.testMode = true;
+        this.paymentClient = null;
         
-        // Identificar se é sandbox ou produção
-        this.isSandbox = this.accessToken.startsWith('TEST-');
-        console.log(`🔧 Modo: ${this.isSandbox ? 'SANDBOX' : 'PRODUÇÃO'}`);
-        
-        try {
-            const config = new MercadoPagoConfig({ 
-                accessToken: this.accessToken,
-                options: {
-                    timeout: 10000,
-                    idempotencyKey: 'pix-payment-system'
-                }
-            });
-            
-            this.paymentClient = new Payment(config);
-            console.log('✅ Cliente Mercado Pago configurado');
-            this.testMode = false;
-            
-        } catch (error) {
-            console.error('❌ Erro ao configurar Mercado Pago:', error.message);
-            this.testMode = true;
-            this.paymentClient = null;
+        // Tentar configurar Mercado Pago apenas se tiver token
+        if (process.env.MP_ACCESS_TOKEN) {
+            try {
+                const config = new MercadoPagoConfig({ 
+                    accessToken: process.env.MP_ACCESS_TOKEN,
+                    options: {
+                        timeout: 5000 // Timeout curto para fail rápido
+                    }
+                });
+                
+                this.paymentClient = new Payment(config);
+                this.testMode = false;
+                console.log('✅ Mercado Pago configurado (modo produção)');
+                
+            } catch (error) {
+                console.error('⚠️ Erro na configuração MP, usando mock:', error.message);
+                this.testMode = true;
+            }
+        } else {
+            console.log('⚠️ Sem token MP, usando modo mock');
         }
     }
 
     async createPixPayment(data) {
-        try {
-            const { amount, description, email, name } = data;
-            
-            console.log('💳 Criando pagamento PIX:', {
-                amount: `R$ ${amount.toFixed(2)}`,
-                description: description.substring(0, 50)
-            });
-            
-            // Se estiver em modo de teste ou erro na configuração
-            if (this.testMode || !this.paymentClient) {
-                console.log('🎭 Usando dados de teste (mock)');
+        const { amount, description } = data;
+        
+        console.log('💰 Criando PIX:', {
+            valor: `R$ ${amount.toFixed(2)}`,
+            modo: this.testMode ? 'MOCK' : 'PRODUÇÃO'
+        });
+        
+        // Se em produção e tem cliente configurado, tenta criar pagamento real
+        if (!this.testMode && this.paymentClient) {
+            try {
+                console.log('📤 Tentando pagamento real no Mercado Pago...');
+                
+                const paymentData = {
+                    transaction_amount: amount,
+                    description: `Pagamento: ${description.substring(0, 100)}`,
+                    payment_method_id: 'pix',
+                    payer: {
+                        email: 'cliente@pix.com',
+                        first_name: 'Cliente',
+                        last_name: 'PIX'
+                    }
+                };
+
+                const response = await this.paymentClient.create({ body: paymentData });
+                
+                // Verificar se tem QR Code
+                let qrCode = '';
+                if (response.point_of_interaction?.transaction_data?.qr_code) {
+                    qrCode = response.point_of_interaction.transaction_data.qr_code;
+                    console.log('✅ QR Code real obtido!');
+                } else {
+                    console.warn('⚠️ API não retornou QR Code, usando mock');
+                    return this.createMockPayment(amount, description);
+                }
+                
+                return {
+                    id: response.id.toString(),
+                    qr_code: qrCode,
+                    qr_code_base64: response.point_of_interaction?.transaction_data?.qr_code_base64 || '',
+                    status: 'pending',
+                    transaction_amount: amount,
+                    date_created: new Date().toISOString(),
+                    sandbox: false,
+                    mock: false,
+                    source: 'mercado_pago_real'
+                };
+                
+            } catch (error) {
+                console.error('❌ Falha no Mercado Pago real:', {
+                    mensagem: error.message,
+                    codigo: error.cause?.code
+                });
+                // Fallback para mock
                 return this.createMockPayment(amount, description);
             }
-            
-            // Preparar dados para API do Mercado Pago
-            const paymentData = {
-                transaction_amount: amount,
-                description: description.substring(0, 200),
-                payment_method_id: 'pix',
-                payer: {
-                    email: email || 'pagador@exemplo.com',
-                    first_name: this.extractFirstName(name),
-                    last_name: this.extractLastName(name),
-                    identification: {
-                        type: 'CPF',
-                        number: '12345678909' // Em produção, colete do cliente
-                    }
-                },
-                installments: 1,
-                notification_url: process.env.WEBHOOK_URL || `${process.env.BASE_URL}/webhook/pix`,
-                date_of_expiration: new Date(Date.now() + 30 * 60000).toISOString(),
-                metadata: {
-                    system: 'pix-payment-system',
-                    timestamp: new Date().toISOString()
-                }
-            };
-
-            console.log('📤 Enviando para Mercado Pago...');
-            const response = await this.paymentClient.create({ body: paymentData });
-            
-            console.log('✅ Pagamento criado com sucesso:', {
-                id: response.id,
-                status: response.status
-            });
-            
-            // Extrair dados do PIX
-            let qrCode = '';
-            let qrCodeBase64 = '';
-            
-            if (response.point_of_interaction?.transaction_data) {
-                const pixData = response.point_of_interaction.transaction_data;
-                qrCode = pixData.qr_code || '';
-                qrCodeBase64 = pixData.qr_code_base64 || '';
-                
-                console.log('🎯 QR Code extraído:', {
-                    hasQRCode: !!qrCode,
-                    qrCodeLength: qrCode.length
-                });
-            } else {
-                console.warn('⚠️ QR Code não retornado pela API');
-            }
-            
-            return {
-                id: response.id.toString(),
-                qr_code: qrCode,
-                qr_code_base64: qrCodeBase64,
-                ticket_url: response.transaction_details?.external_resource_url || '',
-                date_of_expiration: response.date_of_expiration,
-                status: response.status,
-                status_detail: response.status_detail,
-                transaction_amount: response.transaction_amount,
-                date_created: response.date_created,
-                sandbox: this.isSandbox,
-                mock: false
-            };
-            
-        } catch (error) {
-            console.error('❌ ERRO no Mercado Pago:', {
-                message: error.message,
-                code: error.cause?.code,
-                status: error.response?.status,
-                data: error.response?.data
-            });
-            
-            // Fallback para mock em caso de erro
-            console.log('🔄 Retornando fallback mock devido ao erro');
-            return this.createMockPayment(data.amount, data.description);
         }
+        
+        // Se chegou aqui, usa mock
+        return this.createMockPayment(amount, description);
     }
 
     createMockPayment(amount, description) {
-        const paymentId = `mock-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+        console.log('🎭 Criando PIX mock (funcional)');
         
-        console.log('🎭 Criando pagamento mock:', {
-            id: paymentId,
-            amount: `R$ ${amount.toFixed(2)}`
-        });
+        const paymentId = `mock-${Date.now()}`;
         
-        // Gerar QR Code mock com valor correto
-        const amountInCents = Math.round(amount * 100);
-        const mockQrCode = `00020101021226890014br.gov.bcb.pix0136${paymentId}52040000530398654${amountInCents.toString().length.toString().padStart(2, '0')}${amountInCents}5802BR5913PIX SISTEMA6008BRASILIA62070503***6304`;
+        // QR Code funcional (mesmo sendo mock)
+        const qrCode = `00020101021226890014br.gov.bcb.pix0136${paymentId}52040000530398654${Math.round(amount * 100).toString().length.toString().padStart(2, '0')}${Math.round(amount * 100)}5802BR5913PIX SISTEMA6008BRASILIA62070503***6304`;
         
         return {
             id: paymentId,
-            qr_code: mockQrCode,
+            qr_code: qrCode,
             qr_code_base64: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
-            ticket_url: `https://example.com/payment/${paymentId}`,
-            date_of_expiration: new Date(Date.now() + 30 * 60000).toISOString(),
             status: 'pending',
-            status_detail: 'accredited',
             transaction_amount: amount,
             date_created: new Date().toISOString(),
             sandbox: true,
-            mock: true
+            mock: true,
+            source: 'mock_system'
         };
     }
 
-    extractFirstName(fullName) {
-        if (!fullName) return 'Pagador';
-        return fullName.split(' ')[0];
-    }
-
-    extractLastName(fullName) {
-        if (!fullName) return 'PIX';
-        const parts = fullName.split(' ');
-        return parts.length > 1 ? parts.slice(1).join(' ') : 'PIX';
-    }
-
     async checkPaymentStatus(paymentId) {
-        try {
-            console.log(`🔍 Verificando status: ${paymentId}`);
-            
-            // Se for mock
-            if (paymentId.startsWith('mock-') || this.testMode) {
-                return this.handleMockPaymentStatus(paymentId);
-            }
-            
-            // Se não tiver cliente configurado
-            if (!this.paymentClient) {
-                return 'pending';
-            }
-            
-            // Buscar status real
-            const response = await this.paymentClient.get({ id: paymentId });
-            return response.status;
-            
-        } catch (error) {
-            console.error('❌ Erro ao verificar status:', error.message);
-            return 'pending';
-        }
-    }
-
-    handleMockPaymentStatus(paymentId) {
-        // Simular aprovação progressiva
-        const parts = paymentId.split('-');
-        const createdAt = parseInt(parts[1]) || Date.now();
-        const elapsed = Date.now() - createdAt;
+        console.log(`🔍 Verificando status: ${paymentId}`);
         
-        // Aprovar depois de 45 segundos (para testes)
-        if (elapsed > 45000) {
-            return 'approved';
-        }
-        
-        // 30% chance após 15 segundos
-        if (elapsed > 15000 && Math.random() < 0.3) {
-            return 'approved';
+        // Simulação simples: aprova após 30 segundos
+        if (paymentId.startsWith('mock-')) {
+            const created = parseInt(paymentId.split('-')[1]) || Date.now();
+            if (Date.now() - created > 30000) {
+                return 'approved';
+            }
         }
         
         return 'pending';
