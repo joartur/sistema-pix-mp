@@ -3,632 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de PIX - Pague qualquer valor</title>
-    <link rel="stylesheet" href="/assets/css/styles.css">
+    <title>Pagamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
     <style>
-        :root {
-            --primary-color: #00BFA5;
-            --primary-dark: #00897B;
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-        }
-        
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
         }
         
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+        .card-shadow {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 10px 15px rgba(0, 0, 0, 0.05);
         }
         
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        .logo {
-            font-size: 48px;
-            margin-bottom: 15px;
+        .pulse-animation {
+            animation: pulse 2s infinite;
         }
         
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            font-weight: 700;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
         }
         
-        .header p {
-            opacity: 0.9;
-            font-size: 16px;
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
         }
         
-        .content {
-            padding: 40px 30px;
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .input-with-icon {
-            position: relative;
-        }
-        
-        .input-with-icon i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            font-size: 18px;
-        }
-        
-        .input-with-icon input {
-            width: 100%;
-            padding: 15px 15px 15px 50px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .input-with-icon input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.1);
-        }
-
-/* Adicione estas regras no CSS existente */
-
-.input-with-icon input {
-    font-size: 24px !important;
-    font-weight: 600 !important;
-    text-align: center;
-    letter-spacing: 1px;
-    color: #333;
-}
-
-.input-with-icon input::placeholder {
-    color: #aaa;
-    font-weight: 400;
-}
-
-/* Estilo para valor válido/inválido */
-.input-with-icon input.valid {
-    border-color: #4CAF50 !important;
-    background-color: rgba(76, 175, 80, 0.05);
-}
-
-.input-with-icon input.invalid {
-    border-color: #F44336 !important;
-    background-color: rgba(244, 67, 54, 0.05);
-}
-
-/* Exemplos rápidos */
-.quick-examples {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.quick-example {
-    background: #f0f0f0;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.quick-example:hover {
-    background: #e0e0e0;
-    transform: translateY(-2px);
-}
-
-.quick-example:active {
-    transform: translateY(0);
-}
-        
-        .currency-input {
-            font-size: 32px !important;
-            font-weight: 700 !important;
-            text-align: center;
-            padding: 20px !important;
-            color: #333;
-        }
-        
-        .currency-symbol {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-        }
-        
-        .info-box {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .info-box p {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .info-box i {
-            color: var(--primary-color);
-            margin-right: 8px;
-        }
-        
-        .range-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            font-size: 12px;
-            color: #999;
-        }
-        
-        .btn-generate {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-generate:hover {
+        .btn-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 191, 165, 0.3);
-        }
-        
-        .btn-generate:active {
-            transform: translateY(0);
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .error-message i {
-            margin-right: 8px;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-            font-size: 12px;
-            border-top: 1px solid #eee;
-        }
-        
-        .footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                border-radius: 15px;
-            }
-            
-            .header {
-                padding: 30px 20px;
-            }
-            
-            .content {
-                padding: 30px 20px;
-            }
-            
-            .currency-input {
-                font-size: 28px !important;
-                padding: 15px !important;
-            }
+            transition: all 0.3s ease;
         }
     </style>
 </head>
-<body>
-    <div class="container">
+<body class="flex items-center justify-center p-4">
+    <div class="container max-w-4xl mx-auto">
         <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <i class="fas fa-qrcode"></i>
-            </div>
-            <h1>Gerador de PIX</h1>
-            <p>Pague qualquer valor instantaneamente</p>
-        </div>
-        
-        <!-- Conteúdo -->
-        <div class="content">
-            <!-- Mensagem de erro -->
-            <div id="error-message" class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
-                <span id="error-text"></span>
-            </div>
-            
-            <!-- Formulário -->
-            <div class="form-group">
-                <label for="amount">
-                    <i class="fas fa-money-bill-wave"></i> QUANTO VOCÊ DESEJA PAGAR?
-                </label>
-                <div class="input-with-icon">
-                    <span class="currency-symbol">R$</span>
-                    <input 
-                        type="text" 
-                        id="amount" 
-                        class="currency-input"
-                        placeholder="0,00"
-                        value="10,00"
-                    >
+        <header class="text-center mb-10 slide-in">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center mr-3">
+                    <i class="fas fa-qrcode text-white text-xl"></i>
                 </div>
-                <div class="range-info">
-                    <span>Mínimo: R$ 0,01</span>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Testar PIX</h1>
+            </div>
+            <p class="text-gray-600 text-lg">Modo Sandbox • Ambiente de Teste</p>
+            <div class="mt-4 inline-flex items-center bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span class="text-sm font-medium">Use valores pequenos para teste</span>
+            </div>
+        </header>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl card-shadow overflow-hidden slide-in" style="animation-delay: 0.1s">
+            <!-- Card Header -->
+            <div class="gradient-bg px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white">Selecione um valor para teste</h2>
+                        <p class="text-blue-100 text-sm mt-1">Transações simuladas - nenhum valor real é transferido</p>
+                    </div>
+                    <div class="hidden md:block">
+                        <span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm">SANDBOX</span>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Informações -->
-            <div class="info-box">
-                <p><i class="fas fa-bolt"></i> Pagamento instantâneo via PIX</p>
-                <p><i class="fas fa-shield-alt"></i> 100% seguro e criptografado</p>
-                <p><i class="fas fa-clock"></i> QR Code válido por 30 minutos</p>
-            </div>
-            
-            <!-- Botão de gerar -->
-            <button id="generate-btn" class="btn-generate" onclick="generatePix()">
-                <i class="fas fa-qrcode"></i> GERAR QR CODE PIX
-            </button>
-            
-            <!-- Loading -->
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Gerando seu QR Code PIX...</p>
+
+            <!-- Card Body -->
+            <div class="p-6 md:p-8">
+                <!-- Valor Options -->
+                <div class="mb-10">
+                    <h3 class="text-lg font-medium text-gray-700 mb-4">Valores pré-definidos</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- R$ 0,01 -->
+                        <button onclick="selectAmount(0.01)" class="amount-btn p-5 rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 btn-hover group">
+                            <div class="flex flex-col items-center">
+                                <div class="text-2xl font-bold text-gray-800 group-hover:text-blue-600">R$ 0,01</div>
+                                <div class="text-gray-500 text-sm mt-2 group-hover:text-blue-500">1 centavo</div>
+                                <div class="mt-3 px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600">
+                                    <i class="fas fa-coins mr-1"></i> Mínimo
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <!-- R$ 1,00 -->
+                        <button onclick="selectAmount(1.00)" class="amount-btn p-5 rounded-xl border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-300 btn-hover group">
+                            <div class="flex flex-col items-center">
+                                <div class="text-2xl font-bold text-gray-800 group-hover:text-green-600">R$ 1,00</div>
+                                <div class="text-gray-500 text-sm mt-2 group-hover:text-green-500">1 real</div>
+                                <div class="mt-3 px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 group-hover:bg-green-100 group-hover:text-green-600">
+                                    <i class="fas fa-bolt mr-1"></i> Recomendado
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <!-- R$ 10,00 -->
+                        <button onclick="selectAmount(10.00)" class="amount-btn p-5 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 btn-hover group">
+                            <div class="flex flex-col items-center">
+                                <div class="text-2xl font-bold text-gray-800 group-hover:text-purple-600">R$ 10,00</div>
+                                <div class="text-gray-500 text-sm mt-2 group-hover:text-purple-500">10 reais</div>
+                                <div class="mt-3 px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600 group-hover:bg-purple-100 group-hover:text-purple-600">
+                                    <i class="fas fa-chart-line mr-1"></i> Máximo teste
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Valor Customizado -->
+                <div class="mb-10">
+                    <h3 class="text-lg font-medium text-gray-700 mb-4">Outro valor</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    R$
+                                </div>
+                                <input type="number" 
+                                       id="customAmount" 
+                                       step="0.01" 
+                                       min="0.01" 
+                                       max="10.00"
+                                       placeholder="0,00" 
+                                       class="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                                       oninput="validateCustomAmount(this)">
+                                <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    BRL
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-2 text-sm text-gray-500">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span>Digite um valor entre R$ 0,01 e R$ 10,00</span>
+                            </div>
+                        </div>
+                        <button onclick="processCustomAmount()" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all duration-300 btn-hover flex items-center justify-center">
+                            <i class="fas fa-play-circle mr-2"></i>
+                            Testar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resultado (inicialmente escondido) -->
+                <div id="resultSection" class="hidden slide-in">
+                    <div class="border-t pt-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-green-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">PIX Criado com Sucesso!</h3>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <!-- Informações -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-4 rounded-xl">
+                                    <div class="text-sm text-gray-500">ID da Transação</div>
+                                    <div id="paymentId" class="font-mono text-gray-800 font-medium">139558626783</div>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-4 rounded-xl">
+                                    <div class="text-sm text-gray-500">Valor</div>
+                                    <div id="paymentAmount" class="text-2xl font-bold text-green-600">R$ 0,01</div>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-4 rounded-xl">
+                                    <div class="text-sm text-gray-500">Status</div>
+                                    <div class="flex items-center">
+                                        <span id="paymentStatus" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">pending</span>
+                                        <div class="ml-3 w-3 h-3 bg-yellow-500 rounded-full pulse-animation"></div>
+                                    </div>
+                                </div>
+                                
+                                <button onclick="copyToClipboard('139558626783')" class="w-full py-3 border-2 border-blue-500 text-blue-600 font-medium rounded-xl hover:bg-blue-50 transition-all duration-300 flex items-center justify-center">
+                                    <i class="far fa-copy mr-2"></i>
+                                    Copiar ID da Transação
+                                </button>
+                            </div>
+                            
+                            <!-- QR Code Placeholder -->
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-64 h-64 bg-gray-100 rounded-xl flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
+                                    <div class="text-center">
+                                        <i class="fas fa-qrcode text-gray-400 text-5xl mb-3"></i>
+                                        <p class="text-gray-500">QR Code será gerado</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 text-sm text-center">Escaneie com seu app bancário</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+                            <button onclick="checkStatus()" class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-300 btn-hover flex items-center justify-center">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                Verificar Status
+                            </button>
+                            <button onclick="goToCheckout()" class="flex-1 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 btn-hover flex items-center justify-center">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                Abrir Página de Pagamento
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
+
         <!-- Footer -->
-        <div class="footer">
-            <p>Sistema de pagamento via PIX • Use qualquer valor a partir de R$ 0,01</p>
-        </div>
+        <footer class="mt-10 text-center text-gray-500 text-sm slide-in" style="animation-delay: 0.3s">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    <span>Ambiente Seguro • Sandbox</span>
+                </div>
+                <div class="hidden md:block">•</div>
+                <div class="flex items-center">
+                    <i class="fas fa-bolt mr-2"></i>
+                    <span>Transações Instantâneas</span>
+                </div>
+                <div class="hidden md:block">•</div>
+                <div class="flex items-center">
+                    <i class="fas fa-code mr-2"></i>
+                    <span>API PIX • v2.0</span>
+                </div>
+            </div>
+            <p class="mt-4">Este é um ambiente de teste. Nenhuma transação real será processada.</p>
+        </footer>
     </div>
 
     <script>
-        // Elementos
-        const amountInput = document.getElementById('amount');
-        const generateBtn = document.getElementById('generate-btn');
-        const loadingDiv = document.getElementById('loading');
-        const errorDiv = document.getElementById('error-message');
-        const errorText = document.getElementById('error-text');
+        let selectedAmount = 0.01;
         
-        // Variável para armazenar valor numérico
-        let numericValue = 10.00;
-        
-        // Função para formatar número para exibição (R$ 1.234,56)
-        function formatToBrazilian(value) {
-            return value.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            
+            // Remover seleção anterior
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'border-green-500', 'bg-green-50', 'border-purple-500', 'bg-purple-50');
             });
+            
+            // Adicionar feedback visual
+            event.target.classList.add('border-blue-500', 'bg-blue-50');
+            
+            // Atualizar input customizado
+            document.getElementById('customAmount').value = amount.toFixed(2);
+            
+            // Feedback de seleção
+            showToast(`Valor selecionado: R$ ${amount.toFixed(2)}`, 'info');
         }
         
-        // Função para converter string brasileira para número
-        function parseBrazilian(value) {
-            // Remove pontos de milhar, substitui vírgula decimal por ponto
-            const clean = value
-                .replace(/\./g, '')  // Remove pontos (1.234,56 -> 1234,56)
-                .replace(',', '.');   // Substitui vírgula por ponto (1234,56 -> 1234.56)
-            
-            const num = parseFloat(clean);
-            return isNaN(num) ? 0 : num;
+        function validateCustomAmount(input) {
+            let value = parseFloat(input.value);
+            if (value < 0.01) {
+                input.value = "0.01";
+                showToast("Valor mínimo é R$ 0,01", "warning");
+            } else if (value > 10.00) {
+                input.value = "10.00";
+                showToast("Valor máximo para teste é R$ 10,00", "warning");
+            }
         }
         
-        // Atualizar display quando usuário digita
-        amountInput.addEventListener('input', function(e) {
-            // Pega o valor atual
-            let rawValue = e.target.value;
+        function processCustomAmount() {
+            const input = document.getElementById('customAmount');
+            let value = parseFloat(input.value);
             
-            // Permite apenas números, vírgula e ponto
-            rawValue = rawValue.replace(/[^\d,.]/g, '');
-            
-            // Se começar com vírgula ou ponto, adiciona 0 antes
-            if (rawValue.startsWith(',') || rawValue.startsWith('.')) {
-                rawValue = '0' + rawValue;
-            }
-            
-            // Se tiver vírgula E ponto, remove um deles
-            if (rawValue.includes(',') && rawValue.includes('.')) {
-                // Mantém o último separador como decimal
-                const lastComma = rawValue.lastIndexOf(',');
-                const lastDot = rawValue.lastIndexOf('.');
-                const lastSeparator = Math.max(lastComma, lastDot);
-                
-                // Remove todos os separadores após o primeiro
-                const before = rawValue.substring(0, lastSeparator).replace(/[,.]/g, '');
-                const after = rawValue.substring(lastSeparator + 1).replace(/\D/g, '');
-                
-                // Limita a 2 casas decimais
-                const decimals = after.substring(0, 2);
-                rawValue = before + (lastSeparator === lastComma ? ',' : '.') + decimals;
-            }
-            
-            // Se não tiver separador decimal e tiver mais de 2 dígitos,
-            // assume que os últimos 2 são centavos
-            if (!rawValue.includes(',') && !rawValue.includes('.') && rawValue.length > 2) {
-                const reais = rawValue.slice(0, -2);
-                const centavos = rawValue.slice(-2);
-                rawValue = reais + ',' + centavos;
-            }
-            
-            // Atualiza o campo
-            e.target.value = rawValue;
-            
-            // Converte para número
-            numericValue = parseBrazilian(rawValue);
-            
-            // Valida
-            validateAmount(numericValue);
-        });
-        
-        // Formata bonito quando perde o foco
-        amountInput.addEventListener('blur', function() {
-            if (numericValue > 0) {
-                this.value = formatToBrazilian(numericValue);
-            }
-        });
-        
-        // Formata bonito quando ganha foco
-        amountInput.addEventListener('focus', function() {
-            this.select();
-        });
-        
-        // Validação
-        function validateAmount(amount) {
-            if (amount < 0.01) {
-                showError('Valor mínimo é R$ 0,01');
-                generateBtn.disabled = true;
-                return false;
-            }
-            
-            if (amount > 99999999999.99) {
-                showError('Valor máximo é R$ 99.999.999.999,99');
-                generateBtn.disabled = true;
-                return false;
-            }
-            
-            hideError();
-            generateBtn.disabled = false;
-            return true;
-        }
-        
-        // Mensagens de erro
-        function showError(message) {
-            errorText.textContent = message;
-            errorDiv.style.display = 'block';
-            generateBtn.disabled = true;
-        }
-        
-        function hideError() {
-            errorDiv.style.display = 'none';
-            generateBtn.disabled = false;
-        }
-        
-        // Botões de exemplo rápido (opcional)
-        function setExampleAmount(amount) {
-            amountInput.value = formatToBrazilian(amount);
-            numericValue = amount;
-            validateAmount(amount);
-            amountInput.focus();
-            amountInput.select();
-        }
-        
-        // Gerar PIX
-        async function generatePix() {
-            if (!validateAmount(numericValue)) {
+            if (!value || value < 0.01) {
+                showToast("Digite um valor válido (mínimo R$ 0,01)", "error");
+                input.focus();
                 return;
             }
             
-            generateBtn.style.display = 'none';
-            loadingDiv.style.display = 'block';
-            
-            try {
-                // Salva o valor
-                localStorage.setItem('pixAmount', numericValue.toFixed(2));
-                
-                // Redireciona
-                setTimeout(() => {
-                    window.location.href = `/checkout?amount=${numericValue.toFixed(2)}`;
-                }, 500);
-                
-            } catch (error) {
-                showError('Erro ao processar. Tente novamente.');
-                generateBtn.style.display = 'flex';
-                loadingDiv.style.display = 'none';
+            if (value > 10.00) {
+                showToast("Para testes, use no máximo R$ 10,00", "error");
+                return;
             }
+            
+            selectedAmount = value;
+            showToast(`Processando PIX de R$ ${value.toFixed(2)}...`, "success");
+            
+            // Simular criação do PIX
+            setTimeout(() => {
+                showResult();
+            }, 800);
         }
         
-        // Event Listeners
-        generateBtn.addEventListener('click', generatePix);
+        function showResult() {
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('paymentAmount').textContent = `R$ ${selectedAmount.toFixed(2)}`;
+            
+            // Scroll suave para o resultado
+            document.getElementById('resultSection').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            showToast("PIX criado com sucesso! Redirecionando...", "success");
+        }
         
-        amountInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generatePix();
-            }
-        });
+        function checkStatus() {
+            showToast("Verificando status do pagamento...", "info");
+            // Implementar verificação real aqui
+        }
         
-        // Inicialização
-        window.onload = function() {
-            // Carrega valor salvo ou usa padrão
-            const saved = localStorage.getItem('pixAmount');
-            if (saved) {
-                numericValue = parseFloat(saved);
-                if (numericValue >= 0.01) {
-                    amountInput.value = formatToBrazilian(numericValue);
-                }
-            }
-            
-            // Valida
-            validateAmount(numericValue);
-            
-            // Foca no input
-            setTimeout(() => {
-                amountInput.focus();
-                amountInput.select();
-            }, 100);
-            
-            // Adiciona botões de exemplo (opcional)
-            addExampleButtons();
-        };
+        function goToCheckout() {
+            showToast("Abrindo página de pagamento...", "info");
+            window.location.href = "/public/checkout.html";
+        }
         
-        // Função para adicionar botões de exemplo (opcional)
-        function addExampleButtons() {
-            const examples = [
-                { label: 'R$ 0,01', value: 0.01 },
-                { label: 'R$ 1,00', value: 1.00 },
-                { label: 'R$ 10,00', value: 10.00 },
-                { label: 'R$ 100,00', value: 100.00 },
-            ];
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => showToast("ID copiado para a área de transferência!", "success"))
+                .catch(() => showToast("Erro ao copiar", "error"));
+        }
+        
+        function showToast(message, type = "info") {
+            // Remover toast anterior se existir
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
             
-            const container = document.createElement('div');
-            container.className = 'quick-examples';
-            container.style.cssText = `
-                display: flex;
-                gap: 8px;
-                margin-top: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
+            // Cores baseadas no tipo
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            // Criar toast
+            const toast = document.createElement('div');
+            toast.className = `toast fixed top-6 right-6 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-300 slide-in`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} mr-3"></i>
+                    <span>${message}</span>
+                </div>
             `;
             
-            examples.forEach(example => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.textContent = example.label;
-                button.style.cssText = `
-                    background: #f0f0f0;
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: 15px;
-                    font-size: 13px;
-                    color: #666;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                `;
-                
-                button.onmouseover = () => {
-                    button.style.background = '#e0e0e0';
-                    button.style.transform = 'translateY(-2px)';
-                };
-                
-                button.onmouseout = () => {
-                    button.style.background = '#f0f0f0';
-                    button.style.transform = 'translateY(0)';
-                };
-                
-                button.onclick = () => setExampleAmount(example.value);
-                
-                container.appendChild(button);
-            });
+            document.body.appendChild(toast);
             
-            // Insere após o input
-            amountInput.parentNode.parentNode.appendChild(container);
+            // Remover após 3 segundos
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
         
-        // TESTE: Adicione esta função para debug
-        function testInput() {
-            console.log('🧪 Testando entradas:');
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Selecionar valor padrão
+            selectAmount(0.01);
             
-            const testCases = [
-                { input: '001', expected: 0.01 },
-                { input: '1000', expected: 10.00 },
-                { input: '200,50', expected: 200.50 },
-                { input: '200.50', expected: 200.50 },
-                { input: '10000000', expected: 100000.00 },
-                { input: '1234567,89', expected: 1234567.89 }
-            ];
-            
-            testCases.forEach(test => {
-                const result = parseBrazilian(test.input);
-                const passed = Math.abs(result - test.expected) < 0.01;
-                console.log(`${test.input} -> ${result} ${passed ? '✅' : '❌'} (esperado: ${test.expected})`);
+            // Animações de entrada
+            const elements = document.querySelectorAll('.slide-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
             });
-        }
-        
-        // Executa teste ao carregar (pode remover depois)
-        setTimeout(testInput, 1000);
+        });
     </script>
 </body>
 </html>
