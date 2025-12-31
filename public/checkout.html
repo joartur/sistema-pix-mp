@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code PIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,19 +18,13 @@
             min-height: 100vh;
         }
         
-        @media (min-width: 768px) {
-            body {
-                padding: 2rem;
-            }
-        }
-        
         .card-shadow {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .card-shadow {
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             }
         }
         
@@ -42,403 +36,337 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
         
-        .btn-touch {
+        .btn-hover {
             transition: all 0.2s ease;
-            touch-action: manipulation;
         }
         
-        .btn-touch:active {
-            transform: scale(0.98);
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
         
-        @media (min-width: 768px) {
-            .btn-touch:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            }
+        .btn-hover:active {
+            transform: translateY(0);
         }
         
         /* Animações */
         @keyframes pulse-subtle {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            50% { opacity: 0.8; }
         }
         
         .pulse-subtle {
             animation: pulse-subtle 2s ease-in-out infinite;
         }
         
-        @keyframes scaleIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        .animate-scaleIn {
-            animation: scaleIn 0.3s ease-out;
-        }
-        
-        /* QR Code responsivo */
-        .qr-container {
-            max-width: 280px;
-            margin: 0 auto;
-        }
-        
-        @media (min-width: 768px) {
-            .qr-container {
-                max-width: 320px;
-            }
-        }
-        
-        /* Layout desktop */
+        /* Layout específico para desktop */
         @media (min-width: 1024px) {
             .desktop-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 2rem;
-                max-width: 1000px;
-                margin: 0 auto;
+                align-items: start;
             }
             
             .desktop-left-col {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
+                position: sticky;
+                top: 2rem;
             }
             
-            .desktop-right-col {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-        }
-        
-        /* Header responsivo */
-        @media (min-width: 768px) {
-            .header-desktop {
-                max-width: 1000px;
-                margin: 0 auto 2rem;
-                padding: 0 1rem;
-            }
-        }
-        
-        /* Ajustes de tipografia para desktop */
-        @media (min-width: 768px) {
-            .text-responsive {
-                font-size: 1.125rem !important;
-            }
-            
-            .text-responsive-sm {
-                font-size: 1rem !important;
-            }
-            
-            .text-responsive-xs {
-                font-size: 0.875rem !important;
-            }
-            
-            .amount-responsive {
-                font-size: 2.5rem !important;
-            }
-        }
-        
-        /* Modal responsivo */
-        @media (min-width: 768px) {
-            .modal-responsive {
-                max-width: 400px;
-                padding: 2rem;
+            .desktop-qr-container {
+                max-width: 380px;
+                margin: 0 auto;
             }
         }
         
         /* Safe areas para mobile */
-        @media (max-width: 767px) {
-            body {
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            
-            .safe-bottom {
-                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-            }
-            
-            .safe-top {
-                padding-top: env(safe-area-inset-top);
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* Melhorias para desktop */
+        .desktop-text-lg {
+            font-size: 1.125rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .desktop-text-lg {
+                font-size: 1.25rem;
             }
         }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Header - Diferente no mobile/desktop -->
-    <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-30 safe-top">
-        <div class="px-4 py-3 md:py-4 header-desktop">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <!-- Voltar - Sempre visível -->
-                <a href="/" class="flex items-center text-gray-600 active:text-blue-600 hover:text-blue-600 btn-touch transition-colors">
-                    <div class="w-9 h-9 md:w-10 md:h-10 bg-gray-100 active:bg-blue-100 hover:bg-blue-100 rounded-lg md:rounded-xl flex items-center justify-center mr-2 md:mr-3 transition-colors">
-                        <i class="fas fa-arrow-left text-gray-500 text-sm md:text-base"></i>
+                <a href="/" class="flex items-center text-gray-600 hover:text-blue-600 transition-colors group">
+                    <div class="w-10 h-10 bg-gray-100 group-hover:bg-blue-100 rounded-lg flex items-center justify-center mr-3 transition-colors">
+                        <i class="fas fa-arrow-left text-gray-500 group-hover:text-blue-600"></i>
                     </div>
-                    <span class="font-medium text-sm md:text-base">Voltar</span>
+                    <span class="font-medium">Voltar</span>
                 </a>
                 
-                <!-- Logo/Título - Centralizado -->
                 <div class="flex items-center">
-                    <div class="w-10 h-10 md:w-12 md:h-12 primary-gradient rounded-xl md:rounded-2xl flex items-center justify-center mr-2 md:mr-4 shadow">
-                        <i class="fas fa-qrcode text-white text-sm md:text-xl"></i>
+                    <div class="w-12 h-12 primary-gradient rounded-xl flex items-center justify-center mr-4 shadow-md">
+                        <i class="fas fa-qrcode text-white text-lg"></i>
                     </div>
-                    <div class="text-center md:text-left">
-                        <h1 class="text-base md:text-xl font-bold text-gray-900 leading-tight">QR Code PIX</h1>
-                        <p class="text-gray-500 text-xs md:text-sm">Escaneie para pagar</p>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">QR Code PIX</h1>
+                        <p class="text-gray-500 text-sm">Escaneie para pagar</p>
                     </div>
                 </div>
                 
-                <!-- ID da Transação - Apenas no desktop -->
-                <div class="hidden md:block text-sm text-gray-500 text-right">
-                    <div class="font-mono font-bold text-gray-800" id="transactionId">-</div>
+                <div class="text-sm text-gray-500 hidden lg:block">
+                    ID: <span id="transactionId" class="font-mono font-bold">-</span>
                 </div>
-                
-                <!-- Espaçador para mobile -->
-                <div class="md:hidden w-9"></div>
             </div>
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
-    <main class="px-4 md:px-0 py-4 md:py-0">
-        <div class="max-w-7xl mx-auto">
-            <!-- Loading State -->
-            <div id="loadingState" class="text-center py-12 md:py-20">
-                <div class="w-14 h-14 md:w-16 md:h-16 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4 md:mb-6"></div>
-                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Gerando QR Code...</h3>
-                <p class="text-gray-600 text-sm md:text-base">Aguarde alguns instantes</p>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6 lg:py-8">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-12 lg:py-20">
+            <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Gerando QR Code...</h3>
+            <p class="text-gray-600">Aguarde alguns instantes</p>
+        </div>
+
+        <!-- Payment Content -->
+        <div id="paymentContent" class="hidden">
+            <!-- Amount Card - Full Width -->
+            <div class="bg-white rounded-2xl card-shadow p-6 mb-8 text-center">
+                <p class="text-gray-600 text-lg mb-3">VALOR A PAGAR</p>
+                <div id="paymentAmount" class="text-4xl lg:text-5xl font-bold text-emerald-600 mb-4">R$ 0,00</div>
+                <div class="inline-flex items-center px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-full text-base font-medium">
+                    <i class="fas fa-clock mr-2"></i>
+                    Válido por: <span id="countdown" class="font-bold ml-1.5">30:00</span>
+                </div>
             </div>
 
-            <!-- Content Grid -->
-            <div id="paymentContent" class="hidden desktop-grid">
-                <!-- Coluna Esquerda (Mobile: toda, Desktop: esquerda) -->
+            <!-- Desktop Grid Layout -->
+            <div class="desktop-grid">
+                <!-- Left Column - QR Code Section -->
                 <div class="desktop-left-col">
-                    <!-- Valor Card -->
-                    <div class="bg-white rounded-xl md:rounded-2xl card-shadow p-4 md:p-6 text-center">
-                        <p class="text-gray-600 text-sm md:text-base mb-1 md:mb-2">VALOR A PAGAR</p>
-                        <div id="paymentAmount" class="text-3xl md:text-4xl font-bold text-emerald-600 mb-3 md:mb-4">R$ 0,00</div>
-                        <div class="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-amber-50 text-amber-700 rounded-full text-xs md:text-sm font-medium">
-                            <i class="fas fa-clock mr-1.5 md:mr-2 text-xs md:text-sm"></i>
-                            Válido por: <span id="countdown" class="font-bold ml-1">30:00</span>
-                        </div>
-                    </div>
-
-                    <!-- QR Code Section -->
-                    <div class="bg-white rounded-xl md:rounded-2xl card-shadow p-4 md:p-6">
+                    <!-- QR Code Card -->
+                    <div class="bg-white rounded-2xl card-shadow p-6 mb-6 lg:mb-8">
                         <div class="text-center">
                             <!-- QR Code Container -->
-                            <div class="qr-container mb-4 md:mb-6">
-                                <div class="p-3 md:p-4 bg-gradient-to-br from-blue-50 to-emerald-50 rounded-xl md:rounded-2xl">
-                                    <div id="qrCodeContainer" class="bg-white rounded-lg md:rounded-xl p-3 md:p-4">
+                            <div class="desktop-qr-container mb-6">
+                                <div class="p-4 bg-gradient-to-br from-blue-50 to-emerald-50 rounded-2xl">
+                                    <div id="qrCodeContainer" class="bg-white rounded-xl p-4">
                                         <img id="qrCodeImage" src="" alt="QR Code PIX" class="w-full aspect-square hidden">
                                         <div id="qrPlaceholder" class="w-full aspect-square flex items-center justify-center">
-                                            <div class="text-center p-4 md:p-6">
-                                                <div class="w-16 h-16 md:w-20 md:h-20 bg-gray-100 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4">
-                                                    <i class="fas fa-qrcode text-gray-400 text-2xl md:text-3xl"></i>
+                                            <div class="text-center p-6">
+                                                <div class="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                                    <i class="fas fa-qrcode text-gray-400 text-3xl"></i>
                                                 </div>
-                                                <p class="text-gray-700 font-medium text-sm md:text-base">QR Code PIX</p>
-                                                <p class="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">Carregando...</p>
+                                                <p class="text-gray-700 font-medium text-lg">QR Code PIX</p>
+                                                <p class="text-gray-400 mt-2">Carregando...</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <p class="text-gray-600 text-sm md:text-base mb-4 md:mb-6">
-                                <i class="fas fa-mobile-alt mr-1.5 md:mr-2 text-xs md:text-sm"></i>
+                            <p class="text-gray-600 text-lg mb-6">
+                                <i class="fas fa-mobile-alt mr-2"></i>
                                 Use a câmera do seu aplicativo bancário
                             </p>
                             
                             <!-- Status Indicator -->
-                            <div class="bg-gray-50 rounded-lg md:rounded-xl p-3 md:p-4 mb-3 md:mb-4">
+                            <div class="bg-gray-50 rounded-xl p-4 mb-6">
                                 <div class="flex items-center justify-center">
-                                    <div id="statusDot" class="w-2.5 h-2.5 md:w-3 md:h-3 bg-amber-500 rounded-full pulse-subtle mr-2 md:mr-3"></div>
-                                    <span id="statusText" class="font-bold text-amber-600 text-sm md:text-base">AGUARDANDO PAGAMENTO</span>
+                                    <div id="statusDot" class="w-3 h-3 bg-amber-500 rounded-full pulse-subtle mr-3"></div>
+                                    <span id="statusText" class="font-bold text-amber-600 text-lg">AGUARDANDO PAGAMENTO</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Instructions Card -->
-                    <div class="bg-blue-50 rounded-xl md:rounded-2xl p-4 md:p-6 border border-blue-100">
-                        <h4 class="font-bold text-blue-800 text-sm md:text-base mb-2 md:mb-3 flex items-center">
-                            <i class="fas fa-list-ol text-blue-600 mr-2 md:mr-3 text-xs md:text-sm"></i>
+                    <div class="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                        <h4 class="font-bold text-blue-800 text-lg mb-4 flex items-center">
+                            <i class="fas fa-list-ol text-blue-600 mr-3"></i>
                             Como pagar:
                         </h4>
-                        <ol class="text-blue-900 text-sm md:text-base space-y-1.5 md:space-y-2 pl-1">
+                        <ol class="text-blue-900 text-base space-y-3 pl-1">
                             <li class="flex items-start">
-                                <span class="text-blue-700 font-bold mr-2 md:mr-3">1.</span>
+                                <span class="text-blue-700 font-bold mr-3 min-w-5">1.</span>
                                 <span>Abra seu app bancário</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-blue-700 font-bold mr-2 md:mr-3">2.</span>
+                                <span class="text-blue-700 font-bold mr-3 min-w-5">2.</span>
                                 <span>Toque em <strong class="text-blue-700">"Pagar com PIX"</strong></span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-blue-700 font-bold mr-2 md:mr-3">3.</span>
+                                <span class="text-blue-700 font-bold mr-3 min-w-5">3.</span>
                                 <span>Aponte a câmera para o QR Code</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-blue-700 font-bold mr-2 md:mr-3">4.</span>
+                                <span class="text-blue-700 font-bold mr-3 min-w-5">4.</span>
                                 <span>Confirme o pagamento</span>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <!-- Coluna Direita (Mobile: abaixo, Desktop: direita) -->
-                <div class="desktop-right-col mt-6 md:mt-0">
+                <!-- Right Column - Payment Info -->
+                <div class="space-y-6 lg:space-y-8">
                     <!-- Copy PIX Code Card -->
-                    <div class="bg-white rounded-xl md:rounded-2xl card-shadow p-4 md:p-6">
-                        <h3 class="font-bold text-gray-900 text-sm md:text-base mb-3 md:mb-4 flex items-center">
-                            <i class="fas fa-key text-blue-600 mr-2 md:mr-3 text-xs md:text-sm"></i>
+                    <div class="bg-white rounded-2xl card-shadow p-6">
+                        <h3 class="font-bold text-gray-900 text-lg mb-4 flex items-center">
+                            <i class="fas fa-key text-blue-600 mr-3"></i>
                             Código PIX (Copia e Cola)
                         </h3>
                         
-                        <div class="relative mb-3 md:mb-4">
+                        <div class="relative mb-6">
                             <div id="pixCode" 
-                                 class="bg-gray-50 p-3 md:p-4 rounded-lg md:rounded-xl font-mono text-gray-900 overflow-x-auto whitespace-nowrap border border-gray-200 text-xs md:text-sm">
+                                 class="bg-gray-50 p-4 rounded-xl font-mono text-gray-900 overflow-x-auto whitespace-nowrap border border-gray-200 text-sm lg:text-base">
                                 Carregando código PIX...
                             </div>
                             <div id="copySuccess" 
-                                 class="hidden absolute right-3 md:right-4 top-1/2 transform -translate-y-1/2 text-emerald-600">
-                                <i class="fas fa-check-circle text-lg md:text-xl"></i>
+                                 class="hidden absolute right-4 top-1/2 transform -translate-y-1/2 text-emerald-600">
+                                <i class="fas fa-check-circle text-xl"></i>
                             </div>
                         </div>
                         
                         <button onclick="copyPixCode()" 
                                 id="copyBtn" 
-                                class="w-full py-3 md:py-4 primary-gradient active:opacity-95 text-white font-bold rounded-lg md:rounded-xl btn-touch flex items-center justify-center text-sm md:text-base shadow">
-                            <i class="far fa-copy mr-2 md:mr-3"></i>
+                                class="w-full py-4 primary-gradient hover:opacity-95 text-white font-bold rounded-xl btn-hover flex items-center justify-center text-base shadow-md">
+                            <i class="far fa-copy mr-3"></i>
                             Copiar Código PIX
                         </button>
                         
-                        <p class="text-gray-500 text-xs md:text-sm mt-2 md:mt-3 text-center">
+                        <p class="text-gray-500 text-sm mt-3 text-center">
                             Cole este código no campo PIX do seu banco
                         </p>
                     </div>
 
                     <!-- Payment Details Card -->
-                    <div class="bg-white rounded-xl md:rounded-2xl card-shadow p-4 md:p-6">
-                        <h3 class="font-bold text-gray-900 text-sm md:text-base mb-3 md:mb-4 flex items-center">
-                            <i class="fas fa-info-circle text-blue-600 mr-2 md:mr-3 text-xs md:text-sm"></i>
+                    <div class="bg-white rounded-2xl card-shadow p-6">
+                        <h3 class="font-bold text-gray-900 text-lg mb-4 flex items-center">
+                            <i class="fas fa-info-circle text-blue-600 mr-3"></i>
                             Detalhes do Pagamento
                         </h3>
                         
-                        <div class="space-y-2 md:space-y-3 text-sm md:text-base">
-                            <div class="flex justify-between items-center py-2 md:py-3 border-b border-gray-100">
+                        <div class="space-y-4 text-base">
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                 <span class="text-gray-600">ID da transação:</span>
-                                <span id="detailId" class="font-mono font-bold text-gray-900 text-xs md:text-sm">-</span>
+                                <span id="detailId" class="font-mono font-bold text-gray-900">-</span>
                             </div>
-                            <div class="flex justify-between items-center py-2 md:py-3 border-b border-gray-100">
-                                <span class="text-gray-600">Criado em:</span>
-                                <span id="detailDate" class="font-medium text-gray-900 text-xs md:text-sm">-</span>
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <span class="text-gray-600">Data de criação:</span>
+                                <span id="detailDate" class="font-medium text-gray-900">-</span>
                             </div>
-                            <div class="flex justify-between items-center py-2 md:py-3 border-b border-gray-100">
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                 <span class="text-gray-600">Expira em:</span>
-                                <span id="detailExpires" class="font-medium text-gray-900 text-xs md:text-sm">-</span>
+                                <span id="detailExpires" class="font-medium text-gray-900">-</span>
                             </div>
-                            <div class="flex justify-between items-center py-2 md:py-3">
+                            <div class="flex justify-between items-center py-3">
                                 <span class="text-gray-600">Status:</span>
-                                <span id="detailStatus" class="px-2 md:px-3 py-1 md:py-1.5 bg-amber-100 text-amber-800 rounded-full text-xs md:text-sm font-bold">PENDENTE</span>
+                                <span id="detailStatus" class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-bold">PENDENTE</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Progress Bar -->
-                    <div class="bg-white rounded-xl md:rounded-2xl card-shadow p-4 md:p-6">
-                        <div class="mb-3 md:mb-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-gray-700 font-medium text-sm md:text-base">Tempo restante</span>
-                                <span class="text-gray-500 text-xs md:text-sm" id="expiryTime">-</span>
-                            </div>
-                            <div class="h-2 md:h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div id="progressBar" class="h-full bg-gradient-to-r from-emerald-500 via-blue-500 to-red-500 rounded-full transition-all duration-1000" style="width: 100%"></div>
-                            </div>
+                    <!-- Timer Progress Card -->
+                    <div class="bg-white rounded-2xl card-shadow p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-gray-700 font-medium text-lg">Tempo restante</span>
+                            <span class="text-gray-500" id="expiryTime">-</span>
                         </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden mb-3">
+                            <div id="progressBar" class="h-full bg-gradient-to-r from-emerald-500 via-blue-500 to-red-500 rounded-full transition-all duration-1000" style="width: 100%"></div>
+                        </div>
+                        <p class="text-gray-500 text-sm">
+                            O QR Code expira automaticamente após 30 minutos
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-4">
+                        <button onclick="newPayment()" 
+                                class="w-full py-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl btn-hover flex items-center justify-center text-lg shadow-lg">
+                            <i class="fas fa-plus-circle mr-3"></i>
+                            Criar Novo Pagamento
+                        </button>
                         
-                        <!-- Action Buttons -->
-                        <div class="space-y-3 md:space-y-4">
-                            <button onclick="newPayment()" 
-                                    class="w-full py-3 md:py-4 bg-gray-800 active:bg-gray-900 hover:bg-gray-900 text-white font-bold rounded-lg md:rounded-xl btn-touch flex items-center justify-center text-sm md:text-base shadow">
-                                <i class="fas fa-plus-circle mr-2 md:mr-3"></i>
-                                Novo Pagamento
-                            </button>
-                            
-                            <button onclick="checkPaymentStatus()" 
-                                    id="checkStatusBtn"
-                                    class="w-full py-3 border-2 border-blue-600 text-blue-600 active:bg-blue-50 hover:bg-blue-50 font-bold rounded-lg md:rounded-xl btn-touch flex items-center justify-center text-sm md:text-base">
-                                <i class="fas fa-sync-alt mr-2 md:mr-3"></i>
-                                Verificar Status
-                            </button>
-                        </div>
+                        <button onclick="checkPaymentStatus()" 
+                                id="checkStatusBtn"
+                                class="w-full py-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold rounded-xl btn-hover flex items-center justify-center text-base">
+                            <i class="fas fa-sync-alt mr-3"></i>
+                            Verificar Status
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Error State -->
-            <div id="errorState" class="hidden bg-red-50 border border-red-200 rounded-xl md:rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
-                <div class="w-12 h-12 md:w-14 md:h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-lg md:text-xl"></i>
-                </div>
-                <h3 class="text-lg md:text-xl font-bold text-red-800 mb-2">Erro ao carregar</h3>
-                <p class="text-red-600 text-sm md:text-base mb-4 md:mb-6" id="errorMessage"></p>
-                <div class="flex flex-col md:flex-row gap-3 md:gap-4">
-                    <button onclick="window.location.href='/'" 
-                            class="w-full py-3 md:py-3 bg-red-600 active:bg-red-700 hover:bg-red-700 text-white font-bold rounded-lg md:rounded-xl btn-touch">
-                        Voltar para Início
-                    </button>
-                    <button onclick="tryAgain()" 
-                            class="w-full py-3 md:py-3 bg-white border border-red-600 text-red-600 active:bg-red-50 hover:bg-red-50 font-bold rounded-lg md:rounded-xl btn-touch">
-                        Tentar Novamente
-                    </button>
-                </div>
+        <!-- Error State -->
+        <div id="errorState" class="hidden bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-red-800 mb-3">Erro ao carregar pagamento</h3>
+            <p class="text-red-600 mb-8" id="errorMessage"></p>
+            <div class="flex flex-col lg:flex-row gap-4 justify-center">
+                <button onclick="window.location.href='/'" 
+                        class="lg:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl btn-hover transition-colors">
+                    Voltar para Início
+                </button>
+                <button onclick="tryAgain()" 
+                        class="lg:w-auto px-8 py-3 bg-white border border-red-600 text-red-600 hover:bg-red-50 font-bold rounded-xl btn-hover transition-colors">
+                    Tentar Novamente
+                </button>
             </div>
         </div>
     </main>
 
     <!-- Success Modal -->
-    <div id="successModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl md:rounded-3xl w-full max-w-sm md:max-w-md modal-responsive animate-scaleIn">
-            <div class="p-6 md:p-8 text-center">
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
-                    <i class="fas fa-check text-emerald-600 text-2xl md:text-3xl"></i>
+    <div id="successModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 lg:p-6">
+        <div class="bg-white rounded-3xl w-full max-w-md modal-content animate-scaleIn">
+            <div class="p-8 text-center">
+                <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-emerald-600 text-3xl"></i>
                 </div>
                 
-                <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">✅ Pagamento Confirmado!</h2>
-                <p class="text-gray-600 text-sm md:text-base mb-5 md:mb-6">Seu pagamento PIX foi aprovado com sucesso.</p>
+                <h2 class="text-2xl font-bold text-gray-900 mb-3">✅ Pagamento Confirmado!</h2>
+                <p class="text-gray-600 text-lg mb-6">Seu pagamento PIX foi aprovado com sucesso.</p>
                 
-                <div class="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
-                    <div class="grid grid-cols-2 gap-3 md:gap-4 text-sm md:text-base">
+                <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+                    <div class="grid grid-cols-2 gap-4 text-base">
                         <div class="text-left">
-                            <p class="text-gray-500 text-xs md:text-sm mb-1">Valor:</p>
-                            <p id="modalAmount" class="font-bold text-emerald-600 text-base md:text-lg">R$ 0,00</p>
+                            <p class="text-gray-500 text-sm mb-2">Valor:</p>
+                            <p id="modalAmount" class="font-bold text-emerald-600 text-lg">R$ 0,00</p>
                         </div>
                         <div class="text-left">
-                            <p class="text-gray-500 text-xs md:text-sm mb-1">ID:</p>
-                            <p id="modalId" class="font-mono font-bold text-xs md:text-sm">-</p>
+                            <p class="text-gray-500 text-sm mb-2">ID:</p>
+                            <p id="modalId" class="font-mono font-bold text-sm">-</p>
                         </div>
                         <div class="text-left">
-                            <p class="text-gray-500 text-xs md:text-sm mb-1">Status:</p>
-                            <span class="px-2 md:px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs md:text-sm font-bold">APROVADO</span>
+                            <p class="text-gray-500 text-sm mb-2">Status:</p>
+                            <span class="px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold">APROVADO</span>
                         </div>
                         <div class="text-left">
-                            <p class="text-gray-500 text-xs md:text-sm mb-1">Data:</p>
-                            <p id="modalDate" class="font-medium text-xs md:text-sm">-</p>
+                            <p class="text-gray-500 text-sm mb-2">Data:</p>
+                            <p id="modalDate" class="font-medium text-sm">-</p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="space-y-3 md:space-y-4">
+                <div class="space-y-4">
                     <button onclick="closeModal()" 
-                            class="w-full py-3 md:py-4 primary-gradient active:opacity-95 hover:opacity-95 text-white font-bold rounded-lg md:rounded-xl btn-touch">
-                        <i class="fas fa-check mr-2 md:mr-3"></i>
+                            class="w-full py-4 primary-gradient hover:opacity-95 text-white font-bold rounded-xl btn-hover">
+                        <i class="fas fa-check mr-2"></i>
                         OK, Entendi
                     </button>
                     
                     <button onclick="newPayment()" 
-                            class="w-full py-3 md:py-4 border-2 border-blue-600 text-blue-600 active:bg-blue-50 hover:bg-blue-50 font-bold rounded-lg md:rounded-xl btn-touch">
-                        <i class="fas fa-plus-circle mr-2 md:mr-3"></i>
+                            class="w-full py-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold rounded-xl btn-hover">
+                        <i class="fas fa-plus-circle mr-2"></i>
                         Novo Pagamento
                     </button>
                 </div>
@@ -478,9 +406,9 @@
             if (!paymentData) return;
             
             // Atualizar informações básicas
+            document.getElementById('transactionId').textContent = paymentData.paymentId || '-';
             document.getElementById('paymentAmount').textContent = `R$ ${paymentData.amount ? paymentData.amount.toFixed(2) : '0.00'}`;
             document.getElementById('detailId').textContent = paymentData.paymentId || '-';
-            document.getElementById('transactionId').textContent = paymentData.paymentId || '-';
             document.getElementById('detailStatus').textContent = paymentData.status === 'pending' ? 'PENDENTE' : 'APROVADO';
             
             // Atualizar datas
@@ -541,16 +469,9 @@
                 if (timeRemaining < 5 * 60) {
                     countdownElement.classList.remove('text-gray-900');
                     countdownElement.classList.add('text-red-600');
-                    progressBar.classList.remove('from-emerald-500', 'via-blue-500', 'to-red-500');
-                    progressBar.classList.add('from-red-500', 'to-red-600');
                 } else if (timeRemaining < 10 * 60) {
-                    countdownElement.classList.remove('text-gray-900', 'text-red-600');
+                    countdownElement.classList.remove('text-gray-900');
                     countdownElement.classList.add('text-amber-600');
-                    progressBar.classList.remove('from-emerald-500', 'via-blue-500', 'to-red-500');
-                    progressBar.classList.add('from-amber-500', 'via-amber-400', 'to-amber-500');
-                } else {
-                    progressBar.classList.remove('from-red-500', 'to-red-600', 'from-amber-500', 'via-amber-400', 'to-amber-500');
-                    progressBar.classList.add('from-emerald-500', 'via-blue-500', 'to-red-500');
                 }
                 
                 if (timeRemaining <= 0) {
@@ -612,16 +533,16 @@
             
             if (status === 'approved') {
                 statusText.textContent = 'PAGAMENTO APROVADO';
-                statusText.className = 'font-bold text-emerald-600 text-sm md:text-base';
-                statusDot.className = 'w-2.5 h-2.5 md:w-3 md:h-3 bg-emerald-500 rounded-full mr-2 md:mr-3';
+                statusText.className = 'font-bold text-emerald-600 text-lg';
+                statusDot.className = 'w-3 h-3 bg-emerald-500 rounded-full mr-3';
                 detailStatus.textContent = 'APROVADO';
-                detailStatus.className = 'px-2 md:px-3 py-1 md:py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-xs md:text-sm font-bold';
+                detailStatus.className = 'px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold';
             } else {
                 statusText.textContent = 'AGUARDANDO PAGAMENTO';
-                statusText.className = 'font-bold text-amber-600 text-sm md:text-base';
-                statusDot.className = 'w-2.5 h-2.5 md:w-3 md:h-3 bg-amber-500 rounded-full pulse-subtle mr-2 md:mr-3';
+                statusText.className = 'font-bold text-amber-600 text-lg';
+                statusDot.className = 'w-3 h-3 bg-amber-500 rounded-full pulse-subtle mr-3';
                 detailStatus.textContent = 'PENDENTE';
-                detailStatus.className = 'px-2 md:px-3 py-1 md:py-1.5 bg-amber-100 text-amber-800 rounded-full text-xs md:text-sm font-bold';
+                detailStatus.className = 'px-3 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-bold';
             }
         }
         
@@ -639,9 +560,9 @@
             
             // Atualizar botão de verificar status
             const checkBtn = document.getElementById('checkStatusBtn');
-            checkBtn.innerHTML = '<i class="fas fa-check mr-2 md:mr-3"></i>Pago';
-            checkBtn.classList.remove('border-blue-600', 'text-blue-600');
-            checkBtn.classList.add('border-emerald-600', 'text-emerald-600', 'bg-emerald-50');
+            checkBtn.innerHTML = '<i class="fas fa-check mr-3"></i>Pagamento Confirmado';
+            checkBtn.classList.remove('border-blue-600', 'text-blue-600', 'hover:bg-blue-50');
+            checkBtn.classList.add('border-emerald-600', 'text-emerald-600', 'bg-emerald-50', 'cursor-default');
             checkBtn.disabled = true;
         }
         
@@ -674,7 +595,7 @@
                     const copyBtn = document.getElementById('copyBtn');
                     const copySuccess = document.getElementById('copySuccess');
                     
-                    copyBtn.innerHTML = '<i class="fas fa-check mr-2 md:mr-3"></i>Copiado!';
+                    copyBtn.innerHTML = '<i class="fas fa-check mr-3"></i>Copiado!';
                     copyBtn.classList.remove('primary-gradient');
                     copyBtn.classList.add('success-gradient');
                     copySuccess.classList.remove('hidden');
@@ -682,7 +603,7 @@
                     showNotification("Código PIX copiado!", "success");
                     
                     setTimeout(() => {
-                        copyBtn.innerHTML = '<i class="far fa-copy mr-2 md:mr-3"></i>Copiar Código PIX';
+                        copyBtn.innerHTML = '<i class="far fa-copy mr-3"></i>Copiar Código PIX';
                         copyBtn.classList.remove('success-gradient');
                         copyBtn.classList.add('primary-gradient');
                         copySuccess.classList.add('hidden');
@@ -726,34 +647,18 @@
                 info: 'fa-info-circle'
             };
             
+            // Posição responsiva para toast
+            const toastPosition = window.innerWidth > 768 ? 'bottom-8 right-8' : 'top-24 left-1/2 transform -translate-x-1/2';
+            
             // Criar toast
             const toast = document.createElement('div');
-            toast.className = `${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg mb-2`;
-            toast.style.cssText = `
-                position: fixed;
-                top: 5rem;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 40;
-                width: 90%;
-                max-width: 24rem;
-                animation: slideDown 0.3s ease-out;
-            `;
-            
-            // Adicionar animação
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideDown {
-                    from { transform: translate(-50%, -20px); opacity: 0; }
-                    to { transform: translate(-50%, 0); opacity: 1; }
-                }
-            `;
-            document.head.appendChild(style);
+            toast.className = `fixed ${toastPosition} ${colors[type]} text-white px-6 py-4 rounded-xl shadow-xl z-40 animate-slideDown`;
+            toast.style.cssText = window.innerWidth > 768 ? '' : 'width: 90%; max-width: 24rem;';
             
             toast.innerHTML = `
                 <div class="flex items-center">
-                    <i class="fas ${icons[type]} text-base mr-3"></i>
-                    <div class="flex-1 text-sm font-medium">${message}</div>
+                    <i class="fas ${icons[type]} text-lg mr-4"></i>
+                    <div class="flex-1 font-medium">${message}</div>
                 </div>
             `;
             
@@ -762,7 +667,6 @@
             // Auto-remover após 3 segundos
             setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transform = 'translateX(-50%) translateY(-10px)';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
@@ -770,13 +674,6 @@
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             loadPaymentData();
-            
-            // Detectar se é desktop para melhor UX
-            const isDesktop = window.innerWidth >= 1024;
-            if (isDesktop) {
-                // Ajustes específicos para desktop
-                document.body.classList.add('md:p-6');
-            }
         });
     </script>
 </body>
