@@ -193,33 +193,50 @@ app.get('/api/payments/:id/status', async (req, res) => {
             });
         }
         
-        // Verificar status no Mercado Pago
+        // Verificar status no Mercado Pago (FORÇAR atualização)
         let mpStatus = payment.status;
         let approved = payment.approved;
+        let paid = payment.paid;
+        let statusDetail = payment.status_detail;
         
         if (process.env.MP_ACCESS_TOKEN) {
             try {
+                console.log(`📡 Consultando Mercado Pago para: ${payment.mp_id}`);
                 const response = await mercadopago.payment.get(payment.mp_id);
                 const mpPayment = response.body;
                 
                 mpStatus = mpPayment.status;
+                statusDetail = mpPayment.status_detail;
+                
+                console.log(`📊 Status MP: ${mpStatus}, Detail: ${statusDetail}`);
                 
                 // Atualizar cache
                 payment.status = mpStatus;
-                payment.status_detail = mpPayment.status_detail;
+                payment.status_detail = statusDetail;
                 
                 // Verificar se foi aprovado
                 if (mpStatus === 'approved') {
                     approved = true;
+                    paid = true;
                     payment.approved = true;
                     payment.paid = true;
                     payment.approved_at = new Date().toISOString();
                     console.log(`✅ Pagamento confirmado: ${paymentId}`);
                 }
                 
+                // Se for rejeitado
+                if (mpStatus === 'rejected') {
+                    console.log(`❌ Pagamento rejeitado: ${paymentId}`);
+                }
+                
+                // Salvar no cache
+                payments.set(paymentId, payment);
+                
             } catch (mpError) {
                 console.error('Erro ao verificar no MP:', mpError.message);
-                // Continuar com status do cache
+                if (mpError.response && mpError.response.body) {
+                    console.error('Detalhes MP:', mpError.response.body);
+                }
             }
         }
         
@@ -227,18 +244,30 @@ app.get('/api/payments/:id/status', async (req, res) => {
         const now = new Date();
         const elapsed = Math.floor((now - created) / 1000);
         
+        // Verificar se expirou
+        let expired = false;
+        if (payment.expires_at) {
+            const expires = new Date(payment.expires_at);
+            expired = now > expires;
+        }
+        
         res.json({
             success: true,
             data: {
                 paymentId,
                 status: mpStatus,
+                status_detail: statusDetail,
                 approved,
+                paid,
                 pending: !approved && mpStatus === 'pending',
+                expired,
                 elapsed_seconds: elapsed,
                 amount: payment.amount,
+                qr_code_base64: payment.qr_code_base64,
+                qr_code_text: payment.qr_code_text,
                 created_at: payment.created_at,
                 expires_at: payment.expires_at,
-                status_detail: payment.status_detail
+                approved_at: payment.approved_at
             }
         });
         
@@ -246,7 +275,8 @@ app.get('/api/payments/:id/status', async (req, res) => {
         console.error('❌ Erro ao verificar status:', error);
         res.status(500).json({
             success: false,
-            error: 'Erro ao verificar status'
+            error: 'Erro ao verificar status',
+            message: error.message
         });
     }
 });
@@ -386,6 +416,10 @@ app.get('/checkout', (req, res) => {
 // Teste
 app.get('/test', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/test.html'));
+});
+
+app.get('/success', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/success.html'));
 });
 
 // Servir arquivos estáticos

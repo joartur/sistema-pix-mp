@@ -303,6 +303,159 @@
     </div>
 
     <script>
+    // variável global
+    let statusCheckInterval = null;
+
+    function startAutoStatusCheck(paymentId) {
+        if (statusCheckInterval) {
+            clearInterval(statusCheckInterval);
+        }
+        
+        statusCheckInterval = setInterval(async () => {
+            await checkPaymentStatus();
+        }, 10000); // Verificar a cada 10 segundos
+        
+        console.log(`🔍 Iniciando verificação automática para: ${paymentId}`);
+    }
+
+    // Modifique a função checkPaymentStatus para retornar dados
+    async function checkPaymentStatus() {
+        if (!currentPaymentData?.paymentId) {
+            showNotification("Nenhum pagamento gerado", "warning");
+            return null;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE}/payments/${currentPaymentData.paymentId}/status`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+            
+            // Atualizar dados do pagamento
+            currentPaymentData = { ...currentPaymentData, ...result.data };
+            
+            // Atualizar UI
+            updatePaymentUI(currentPaymentData);
+            
+            // Verificar se foi aprovado
+            if (result.data.approved || result.data.paid) {
+                showNotification("✅ Pagamento aprovado com sucesso!", "success");
+                
+                // Parar verificação automática
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
+                }
+                
+                // Atualizar botões
+                document.getElementById('checkStatusBtn').innerHTML = '<i class="fas fa-check mr-3"></i>Pagamento Confirmado';
+                document.getElementById('checkStatusBtn').classList.remove('primary-gradient');
+                document.getElementById('checkStatusBtn').classList.add('success-gradient', 'cursor-not-allowed');
+                document.getElementById('checkStatusBtn').disabled = true;
+                
+                document.getElementById('goToCheckoutBtn').innerHTML = '<i class="fas fa-external-link-alt mr-3"></i>Ver Detalhes';
+            } else if (result.data.expired) {
+                showNotification("❌ Pagamento expirado. Gere um novo PIX.", "error");
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
+                }
+            } else {
+                showNotification("Aguardando confirmação do pagamento...", "info");
+            }
+            
+            return result.data;
+            
+        } catch (error) {
+            console.error('Erro ao verificar status:', error);
+            showNotification("Erro ao verificar status", "error");
+            return null;
+        }
+    }
+
+    // Substitua a parte que mostra "Pagamento Confirmado" por:
+    if (result.data.approved || result.data.paid) {
+        showNotification("✅ Pagamento aprovado! Redirecionando...", "success");
+        
+        // Parar verificações
+        if (statusCheckInterval) {
+            clearInterval(statusCheckInterval);
+            statusCheckInterval = null;
+        }
+        
+        // Redirecionar para página de sucesso após 2 segundos
+        setTimeout(() => {
+            window.location.href = '/success';
+        }, 2000);
+    }
+
+    // Modifique a função createPixPayment para iniciar o polling
+    async function createPixPayment() {
+        const amount = parseFloat(document.getElementById('customAmount').value) || selectedAmount;
+        
+        if (amount < 0.01 || amount > 50000) {
+            showError("Valor inválido", "Informe um valor entre R$ 0,01 e R$ 50.000,00");
+            return;
+        }
+        
+        // Mostrar loading
+        showLoading(true);
+        hideError();
+        
+        try {
+            const response = await fetch(`${API_BASE}/payments/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    description: `Pagamento PIX de R$ ${amount.toFixed(2)}`,
+                    customerEmail: 'cliente@pix.com',
+                    customerName: 'Cliente PIX'
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Erro ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Erro ao criar pagamento');
+            }
+            
+            // Salvar dados do pagamento
+            currentPaymentData = result.data;
+            
+            // Atualizar UI com os dados
+            updatePaymentUI(currentPaymentData);
+            
+            // Esconder loading e mostrar resultado
+            showLoading(false);
+            showResult();
+            
+            // Iniciar verificação automática
+            startAutoStatusCheck(currentPaymentData.paymentId);
+            
+            showNotification("PIX gerado com sucesso! Aguardando pagamento...", "success");
+            
+        } catch (error) {
+            console.error('Erro ao criar PIX:', error);
+            showLoading(false);
+            showError("Erro ao gerar PIX", error.message || "Tente novamente mais tarde");
+        }
+    }
+
         // Usar caminhos relativos para a API
         const API_BASE = '/api';
         
