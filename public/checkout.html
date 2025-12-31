@@ -536,6 +536,93 @@
                 }
             }, 5000); // Verificar a cada 5 segundos
         }
+
+        // Função para iniciar o contador de 30 minutos
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const payButton = document.getElementById('payButton');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            // Tempo total em minutos
+            const totalMinutes = 30;
+            let timeRemaining = totalMinutes * 60; // Converter para segundos
+            
+            // Atualizar o contador a cada segundo
+            const countdownInterval = setInterval(() => {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                
+                // Formatar para exibição (ex: "30:00")
+                countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Verificar se o tempo acabou
+                if (timeRemaining <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.textContent = '00:00';
+                    countdownElement.style.color = '#dc3545'; // Vermelho
+                    statusMessage.textContent = 'QR Code expirado!';
+                    statusMessage.style.color = '#dc3545';
+                    payButton.textContent = 'Gerar Novo QR Code';
+                    payButton.onclick = generateNewQRCode;
+                }
+                
+                timeRemaining--;
+            }, 1000);
+            
+            // Retornar o intervalo para poder limpar se necessário
+            return countdownInterval;
+        }
+
+        // Função para gerar novo QR Code
+        function generateNewQRCode() {
+            // Aqui você chamaria sua API para gerar um novo PIX
+            console.log('Gerando novo QR Code...');
+            
+            // Exemplo: recarregar a página para simular novo pagamento
+            location.reload();
+        }
+
+        // Função para verificar status do pagamento
+        function checkPaymentStatus() {
+            // Aqui você implementaria a verificação do pagamento
+            console.log('Verificando status do pagamento...');
+            
+            // Exemplo de implementação
+            fetch('/api/check-payment-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'completed') {
+                        alert('Pagamento confirmado! Obrigado.');
+                        // Redirecionar ou mostrar sucesso
+                    } else {
+                        alert('Pagamento ainda não confirmado. Aguarde...');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar status:', error);
+                });
+        }
+
+        // Função para copiar código PIX
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCode').textContent;
+            
+            navigator.clipboard.writeText(pixCode)
+                .then(() => {
+                    alert('Código PIX copiado!');
+                })
+                .catch(err => {
+                    console.error('Erro ao copiar:', err);
+                    // Fallback para navegadores antigos
+                    const textArea = document.createElement('textarea');
+                    textArea.value = pixCode;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Código PIX copiado!');
+                });
+        }       
         
         // Atualizar status
         function updatePaymentStatus(status) {
