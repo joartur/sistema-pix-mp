@@ -1204,39 +1204,21 @@ a:hover {
         color: #9ca3af;
         opacity: 1;
     }
+    
+    /* Ajuste específico para o texto "R$" e o valor */
     .main-input {
-        padding-left: 3.5rem !important;
-        font-size: 1.125rem !important;
-        letter-spacing: 0.3px;
+        font-size: 1.25rem;
+        line-height: 1.5;
     }
     
-    .relative .absolute.left-3 {
-        left: 1rem !important;
+    .main-input::-webkit-inner-spin-button,
+    .main-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
     
-    .relative .absolute.left-3 span {
-        font-size: 1rem !important;
-    }
-    
-    .main-input {
-        padding-left: 24px !important;
-        padding-right: 16px !important;
-        text-indent: 0 !important;
-    }
-    
-    /* Correção para o texto não ficar escondido atrás do "R$" */
-    .main-input {
-        padding-left: 32px !important;
-    }
-    
-    /* Ajuste de espaçamento interno para melhor visualização no mobile */
-    .main-input::placeholder {
-        color: #9ca3af;
-        opacity: 1;
-    }
-    
-    .main-input:focus {
-        outline: none;
+    .main-input[type=number] {
+        -moz-appearance: textfield;
     }
 
 }
