@@ -156,9 +156,3 @@ ALLOWED_ORIGINS=http://localhost:3000
 ## 📄 Licença
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
-
----
-
-**⭐️ Dê uma estrela se este projeto ajudou você!**
-
-Feito com ❤️ no Brasil 🇧🇷
