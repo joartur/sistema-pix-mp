@@ -1204,6 +1204,28 @@ a:hover {
         color: #9ca3af;
         opacity: 1;
     }
+    .main-input {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+    
+    .main-input::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+    }
+    
+    .main-input:focus {
+        outline: none;
+    }
+    
+    .main-input {
+        padding-left: 24px !important;
+    }
+    
+    .main-input ~ .absolute.right-3 {
+        right: 12px !important;
+    }
+
 }
 
 @media (max-width: 480px) {
