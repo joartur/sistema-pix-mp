@@ -14,7 +14,7 @@ Sistema completo para geração e gerenciamento de pagamentos PIX com integraç�
 1. **Clone o repositório**
 ```bash
 git clone https://github.com/seu-usuario/sistema-pix-mp.git
-cd fazmeupix
+cd sistema-pix-mp
 ```
 
 2. **Instale as dependências**
