@@ -1192,6 +1192,24 @@ a:hover {
     }
 }
 
+@media (max-width: 640px) {
+    /* Ajuste específico para o input de valor customizado em mobile */
+    #customAmount {
+        padding-left: 4.5rem !important; /* Aumenta o espaço para o "R$" */
+        letter-spacing: 0.5px; /* Melhora a legibilidade do texto */
+    }
+    
+    /* Ajusta a posição do símbolo R$ para mobile */
+    .relative .absolute.left-4 {
+        left: 1.2rem !important;
+    }
+    
+    /* Aumenta um pouco o tamanho da fonte para melhor legibilidade */
+    .main-input {
+        font-size: 1.25rem !important;
+    }
+}
+
 @media (max-width: 480px) {
     .container {
         padding: var(--spacing-sm);
