@@ -1190,23 +1190,33 @@ a:hover {
         grid-template-columns: 1fr;
         text-align: center;
     }
-}
 
-@media (max-width: 640px) {
-    /* Ajuste específico para o input de valor customizado em mobile */
     #customAmount {
-        padding-left: 4.5rem !important; /* Aumenta o espaço para o "R$" */
-        letter-spacing: 0.5px; /* Melhora a legibilidade do texto */
+        padding-left: 3.5rem !important; /* Mais espaço para o R$ em mobile */
+        font-size: 1.125rem !important; /* Texto um pouco menor para caber melhor */
+        padding-right: 2.5rem !important; /* Mais espaço para BRL */
     }
     
-    /* Ajusta a posição do símbolo R$ para mobile */
-    .relative .absolute.left-4 {
-        left: 1.2rem !important;
+    /* Posiciona o R$ mais à direita em mobile */
+    .relative .absolute.left-3 {
+        left: 1rem !important;
     }
     
-    /* Aumenta um pouco o tamanho da fonte para melhor legibilidade */
-    .main-input {
-        font-size: 1.25rem !important;
+    /* Ajusta o tamanho do texto do R$ em mobile */
+    .relative .absolute.left-3 span {
+        font-size: 1rem !important;
+    }
+    
+    /* Ajusta o BRL para ficar mais compacto em mobile */
+    .relative .absolute.right-3 {
+        right: 0.75rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    /* Adiciona espaçamento entre os caracteres para melhor legibilidade */
+    #customAmount::placeholder,
+    #customAmount {
+        letter-spacing: 0.3px;
     }
 }
 
@@ -1225,6 +1235,17 @@ a:hover {
     
     .additional-info {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 375px) {
+    #customAmount {
+        padding-left: 3rem !important;
+        font-size: 1rem !important;
+    }
+    
+    .relative .absolute.left-3 {
+        left: 0.75rem !important;
     }
 }
 
