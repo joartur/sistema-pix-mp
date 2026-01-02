@@ -1191,34 +1191,22 @@ a:hover {
         text-align: center;
     }
     .main-input {
-        padding-left: 24px !important;
-        padding-right: 16px !important;
+        font-size: 1.25rem !important;
+        padding-left: 4rem !important; /* ESPAÇO EXTRA PARA O R$ */
+        letter-spacing: 1px !important; /* ESPAÇAMENTO ENTRE CARACTERES */
+        text-indent: 0.5rem; /* ESPAÇO EXTRA APÓS O R$ */
     }
     
-    .main-input::placeholder {
-        padding-left: 24px;
-        color: #9ca3af;
-        opacity: 1;
+    /* AJUSTE DO POSICIONAMENTO DO R$ */
+    .relative > .absolute.left-3 {
+        left: 1.5rem !important;
     }
     
-    .main-input:focus {
-        outline: none;
+    /* GARANTIR QUE O R$ FIQUE POR CIMA */
+    .relative > .absolute.left-3 {
+        z-index: 20;
     }
-    
-    /* Correção para evitar sobreposição do texto "R$" com o valor */
-    .main-input {
-        padding-left: 32px !important;
-    }
-    
-    /* Ajuste para garantir que o texto não fique escondido atrás do "R$" */
-    .main-input {
-        text-indent: 0 !important;
-    }
-    
-    /* Garantir que o valor seja visível mesmo quando digitado */
-    .main-input {
-        padding-left: 36px !important;
-    }
+
 }
 
 @media (max-width: 480px) {
