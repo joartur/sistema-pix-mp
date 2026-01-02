@@ -1196,6 +1196,7 @@ a:hover {
     }
     
     .main-input::placeholder {
+        padding-left: 24px;
         color: #9ca3af;
         opacity: 1;
     }
