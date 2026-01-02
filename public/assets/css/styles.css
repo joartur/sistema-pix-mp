@@ -1137,32 +1137,6 @@ a:hover {
 }
 
 /* ===== RESPONSIVIDADE ===== */
-@media (max-width: 1024px) {
-    #customAmount {
-        padding-left: 3.5rem !important; 
-        font-size: 1.125rem !important;
-        padding-right: 2.5rem !important;
-    }
-    
-    .relative .absolute.left-3 {
-        left: 1rem !important;
-    }
-    
-    .relative .absolute.left-3 span {
-        font-size: 1rem !important;
-    }
-    
-    .relative .absolute.right-3 {
-        right: 0.75rem !important;
-        font-size: 0.875rem !important;
-    }
-    
-    #customAmount::placeholder,
-    #customAmount {
-        letter-spacing: 0.3px;
-    }
-}
-
 @media (max-width: 768px) {
     :root {
         --spacing-md: 16px;
@@ -1216,6 +1190,20 @@ a:hover {
         grid-template-columns: 1fr;
         text-align: center;
     }
+    .main-input {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+    
+    .main-input:focus {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+    
+    .main-input::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1233,17 +1221,6 @@ a:hover {
     
     .additional-info {
         grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 375px) {
-    #customAmount {
-        padding-left: 3rem !important;
-        font-size: 1rem !important;
-    }
-    
-    .relative .absolute.left-3 {
-        left: 0.75rem !important;
     }
 }
 
