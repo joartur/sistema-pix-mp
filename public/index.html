@@ -114,18 +114,18 @@
                             </div>
                         </button>
                         
-                        <button onclick="selectAmount(25.00)" 
+                        <button onclick="selectAmount(1.00)" 
                                 class="amount-option btn-touch group p-3 rounded-lg border border-gray-200 hover:border-emerald-500 active:bg-emerald-50">
                             <div class="flex flex-col items-center">
-                                <div class="text-base font-bold text-gray-900 group-active:text-emerald-600">R$ 25,00</div>
+                                <div class="text-base font-bold text-gray-900 group-active:text-emerald-600">R$ 1,00</div>
                                 <div class="text-gray-500 text-xs mt-1">Recomendado</div>
                             </div>
                         </button>
                         
-                        <button onclick="selectAmount(50.00)" 
+                        <button onclick="selectAmount(10.00)" 
                                 class="amount-option btn-touch group p-3 rounded-lg border border-gray-200 hover:border-purple-500 active:bg-purple-50">
                             <div class="flex flex-col items-center">
-                                <div class="text-base font-bold text-gray-900 group-active:text-purple-600">R$ 50,00</div>
+                                <div class="text-base font-bold text-gray-900 group-active:text-purple-600">R$ 10,00</div>
                                 <div class="text-gray-500 text-xs mt-1">Popular</div>
                             </div>
                         </button>
@@ -137,9 +137,8 @@
                     <h3 class="text-base font-semibold text-gray-800 mb-3">Ou digite outro valor</h3>
                     
                     <div class="relative mb-4">
-                        <!-- Símbolo R$ com posicionamento mais seguro -->
-                        <div class="absolute left-4 md:left-4 top-1/2 transform -translate-y-1/2 z-10">
-                            <span class="text-lg font-bold text-gray-500 bg-white pr-2">R$</span>
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                            <span class="text-lg font-bold text-gray-500">R$</span>
                         </div>
                         <input type="number" 
                             id="customAmount" 
@@ -147,11 +146,11 @@
                             min="0.01" 
                             max="50000.00"
                             placeholder="0,00" 
-                            class="input-touch main-input w-full pl-16 md:pl-14 pr-12 py-3 text-xl border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
+                            class="input-touch main-input w-full pl-12 pr-10 py-3 text-xl border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                             oninput="validateCustomAmount(this)"
                             value="0.01"
                             inputmode="decimal">
-                        <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm bg-white pl-2">
+                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                             BRL
                         </div>
                     </div>
@@ -172,7 +171,7 @@
             </div>
         </div>
 
-        <!-- Loading Overlay - Otimizado para mobile -->
+        <!-- Loading Overlay -->
         <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-white rounded-xl p-6 w-full max-w-xs text-center">
                 <div class="w-12 h-12 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -181,7 +180,7 @@
             </div>
         </div>
 
-        <!-- Footer - Menor no mobile -->
+        <!-- Footer -->
         <footer class="mt-8 text-center text-gray-500 text-xs safe-bottom px-2">
             <div class="flex items-center justify-center mb-2">
                 <i class="fas fa-shield-alt text-emerald-500 mr-1.5 text-xs"></i>
@@ -191,7 +190,7 @@
         </footer>
     </div>
 
-    <!-- Toast Notification - Posicionado para mobile -->
+    <!-- Toast Notification -->
     <div id="toastContainer" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 w-full max-w-xs px-2"></div>
 
     <script>

@@ -1191,23 +1191,22 @@ a:hover {
         text-align: center;
     }
     .main-input {
-        padding-left: 16px !important;
+        padding-left: 24px !important;
         padding-right: 16px !important;
+        text-indent: 0 !important;
     }
     
-    .main-input:focus {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
+    .main-input {
+        padding-left: 32px !important;
     }
     
     .main-input::placeholder {
         color: #9ca3af;
         opacity: 1;
     }
-    .main-input {
-        padding-left: 3.5rem !important;
-        font-size: 1.125rem !important;
-        letter-spacing: 0.3px;
+    
+    .main-input:focus {
+        outline: none;
     }
     
     .relative .absolute.left-3 {
