@@ -85,7 +85,7 @@
             </div>
         </header>
 
-        <!-- Main Card - Ajustado para mobile -->
+        <!-- Main Card -->
         <div class="bg-white rounded-2xl card-shadow overflow-hidden">
             <!-- Card Header -->
             <div class="primary-gradient px-5 py-4">
@@ -100,32 +100,32 @@
                 </div>
             </div>
 
-            <!-- Card Body - Reorganizado para mobile -->
+            <!-- Card Body -->
             <div class="p-5">
-                <!-- Valor Options - Grid 3 colunas no mobile -->
+                <!-- Valor Options -->
                 <div class="mb-6">
                     <h3 class="text-base font-semibold text-gray-800 mb-3">Valores sugeridos</h3>
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="selectAmount(0.01)" 
+                        <button onclick="selectAmount(10.00)" 
                                 class="amount-option btn-touch group p-3 rounded-lg border border-gray-200 hover:border-blue-500 active:bg-blue-50">
                             <div class="flex flex-col items-center">
-                                <div class="text-base font-bold text-gray-900 group-active:text-blue-600">R$ 0,01</div>
+                                <div class="text-base font-bold text-gray-900 group-active:text-blue-500">R$ 10,00</div>
                                 <div class="text-gray-500 text-xs mt-1">Mínimo</div>
                             </div>
                         </button>
                         
-                        <button onclick="selectAmount(1.00)" 
+                        <button onclick="selectAmount(25.00)" 
                                 class="amount-option btn-touch group p-3 rounded-lg border border-gray-200 hover:border-emerald-500 active:bg-emerald-50">
                             <div class="flex flex-col items-center">
-                                <div class="text-base font-bold text-gray-900 group-active:text-emerald-600">R$ 1,00</div>
+                                <div class="text-base font-bold text-gray-900 group-active:text-emerald-600">R$ 25,00</div>
                                 <div class="text-gray-500 text-xs mt-1">Recomendado</div>
                             </div>
                         </button>
                         
-                        <button onclick="selectAmount(10.00)" 
+                        <button onclick="selectAmount(50.00)" 
                                 class="amount-option btn-touch group p-3 rounded-lg border border-gray-200 hover:border-purple-500 active:bg-purple-50">
                             <div class="flex flex-col items-center">
-                                <div class="text-base font-bold text-gray-900 group-active:text-purple-600">R$ 10,00</div>
+                                <div class="text-base font-bold text-gray-900 group-active:text-purple-600">R$ 50,00</div>
                                 <div class="text-gray-500 text-xs mt-1">Popular</div>
                             </div>
                         </button>
