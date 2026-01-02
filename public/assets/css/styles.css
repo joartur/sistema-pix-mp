@@ -1195,32 +1195,23 @@ a:hover {
         padding-right: 16px !important;
     }
     
-    .main-input:focus {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-    }
-    
     .main-input::placeholder {
         color: #9ca3af;
         opacity: 1;
     }
     
-    /* Ajuste específico para o texto "R$" e o valor */
+    .main-input:focus {
+        outline: none;
+    }
+    
+    /* Ajuste específico para o texto "R$" e valor não ficarem sobrepostos */
     .main-input {
-        font-size: 1.25rem;
-        line-height: 1.5;
+        padding-left: 24px !important;
     }
     
-    .main-input::-webkit-inner-spin-button,
-    .main-input::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+    .main-input ~ .absolute.right-3 {
+        right: 12px !important;
     }
-    
-    .main-input[type=number] {
-        -moz-appearance: textfield;
-    }
-
 }
 
 @media (max-width: 480px) {
