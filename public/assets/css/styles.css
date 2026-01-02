@@ -1191,7 +1191,7 @@ a:hover {
         text-align: center;
     }
     .main-input {
-        padding-left: 16px !important;
+        padding-left: 24px !important;
         padding-right: 16px !important;
     }
     
@@ -1204,13 +1204,19 @@ a:hover {
         outline: none;
     }
     
-    /* Ajuste específico para o texto "R$" e valor não ficarem sobrepostos */
+    /* Correção para evitar sobreposição do texto "R$" com o valor */
     .main-input {
-        padding-left: 24px !important;
+        padding-left: 32px !important;
     }
     
-    .main-input ~ .absolute.right-3 {
-        right: 12px !important;
+    /* Ajuste para garantir que o texto não fique escondido atrás do "R$" */
+    .main-input {
+        text-indent: 0 !important;
+    }
+    
+    /* Garantir que o valor seja visível mesmo quando digitado */
+    .main-input {
+        padding-left: 36px !important;
     }
 }
 
