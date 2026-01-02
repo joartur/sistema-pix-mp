@@ -153,11 +153,6 @@ ALLOWED_ORIGINS=http://localhost:3000
    - O sistema verifica automaticamente a cada 10 segundos
    - Aguarde alguns segundos após o pagamento
 
-## 📞 Suporte
-
-- **Issues**: [GitHub Issues](https://github.com/seu-usuario/sistema-pix-mp/issues)
-- **Email**: seu-email@exemplo.com
-
 ## 📄 Licença
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
